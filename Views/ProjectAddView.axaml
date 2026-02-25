@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KontrolSage.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="KontrolSage.Views.ProjectAddView"
+             x:DataType="vm:ProjectAddViewModel">
+    
+    <Border Padding="40">
+        <StackPanel Spacing="15" MaxWidth="500">
+            <TextBlock Text="{Binding Title}" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+            
+            <TextBlock Text="Nombre del Proyecto"/>
+            <TextBox Text="{Binding Name}" Watermark="Ej. Construcción Casa Lomas"/>
+            
+            <TextBlock Text="Descripción"/>
+            <TextBox Text="{Binding Description}" Watermark="Detalles del proyecto..." Height="80" AcceptsReturn="True"/>
+            
+            <Grid ColumnDefinitions="*,10,*">
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Fecha Inicio"/>
+                    <DatePicker SelectedDate="{Binding StartDate}"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Fecha Fin (Estimada)"/>
+                    <DatePicker SelectedDate="{Binding EndDate}"/>
+                </StackPanel>
+            </Grid>
+            
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+            
+            <StackPanel Orientation="Horizontal" Spacing="20" Margin="0,20,0,0" HorizontalAlignment="Right">
+                <Button Content="Cancelar" Command="{Binding CancelCommand}" Background="Transparent" Foreground="Gray"/>
+                <Button Content="Guardar" Command="{Binding SaveCommand}" Background="#007ACC" Foreground="White"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -1,0 +1,118 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KontrolSage.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="KontrolSage.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+    
+    <UserControl.Styles>
+        <Style Selector="Button.menuItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#333"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="CommandParameter" Value="{Binding}"/>
+        </Style>
+        <Style Selector="Button.menuItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#E0E0E0"/>
+        </Style>
+    </UserControl.Styles>
+    
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="{x:Type vm:HomeViewModel}">
+             <Grid>
+                 <TextBlock Text="{Binding Welcome}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="#555"/>
+             </Grid>
+        </DataTemplate>
+        <!-- Other DataTemplates are handled by ViewLocator if Views exist -->
+    </UserControl.DataTemplates>
+
+    <Grid>
+        <!-- Top Bar Area -->
+        <Grid RowDefinitions="Auto,*,Auto">
+            
+            <!-- Top Bar -->
+            <Border Grid.Row="0" Background="#007ACC" Height="50" Padding="15,0">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Button Grid.Column="0" Command="{Binding TogglePaneCommand}" Background="Transparent" BorderThickness="0" VerticalAlignment="Center">
+                        <PathIcon Data="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" Foreground="White"/>
+                    </Button>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0,0,0" Spacing="20">
+                        <TextBlock Text="Kontrol Sage Dashboard" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+                        
+                        <ComboBox ItemsSource="{Binding Projects}" 
+                                  SelectedItem="{Binding SelectedProject}"
+                                  DisplayMemberBinding="{Binding Name}"
+                                  Width="200"
+                                  VerticalAlignment="Center"
+                                  PlaceholderText="Selecciona un Proyecto..."
+                                  Background="White" Foreground="Black">
+                        </ComboBox>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                         <Button Background="Transparent" BorderThickness="0">
+                             <StackPanel Orientation="Horizontal" Spacing="8">
+                                 <TextBlock Text="{Binding User.Username}" Foreground="White" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                 <PathIcon Data="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" 
+                                           Foreground="White" VerticalAlignment="Center"/>
+                             </StackPanel>
+                             <Button.Flyout>
+                                 <MenuFlyout>
+                                     <MenuItem Header="Cerrar Sesión" Command="{Binding LogoutCommand}">
+                                         <MenuItem.Icon>
+                                             <PathIcon Data="M17,17.25V14H10V10H17V6.75L22.25,12L17,17.25M13,2H7A2,2 0 0,0 5,4V20A2,2 0 0,0 7,22H13A2,2 0 0,0 15,20V16H13V20H7V4H13V8H15V4A2,2 0 0,0 13,2Z" Width="16" Height="16"/>
+                                         </MenuItem.Icon>
+                                     </MenuItem>
+                                 </MenuFlyout>
+                             </Button.Flyout>
+                         </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Main Content Area with SplitView -->
+            <SplitView Grid.Row="1" IsPaneOpen="{Binding IsPaneOpen}"
+                       DisplayMode="Inline" OpenPaneLength="200" CompactPaneLength="0"
+                       PaneBackground="#F5F5F5">
+                
+                <SplitView.Pane>
+                    <StackPanel Spacing="5" Margin="0,10">
+                        <Button Classes="menuItem" Content="🏠 Dashboard" Command="{Binding ShowHomeCommand}"/>
+                        <Button Classes="menuItem" Content="📊 Dashboard EVM" Command="{Binding ShowDashboardKpiCommand}"/>
+                        <Button Classes="menuItem" Content="📁 Proyectos" Command="{Binding ShowProjectListCommand}"/>
+                        <Button Classes="menuItem" Content="👥 Organigrama (EDO)" Command="{Binding ShowEdoCommand}"/>
+                        <Button Classes="menuItem" Content="💰 Cuentas (EDC)" Command="{Binding ShowEdcCommand}"/>
+                        <Button Classes="menuItem" Content="🏗️ Estructura de Trabajo (EDT)" Command="{Binding ShowEdtCommand}"/>
+                        <Button Classes="menuItem" Content="📘 Catálogo Maestro APU" Command="{Binding ShowMasterCatalogCommand}"/>
+                        <Button Classes="menuItem" Content="📈 Análisis de Costo Directo" Command="{Binding ShowDirectCostCommand}"/>
+                        <Button Classes="menuItem" Content="📊 Captura de Avance" Command="{Binding ShowAvanceCommand}"/>
+                        <Button Classes="menuItem" Content="💵 Costo Real" Command="{Binding ShowCostoRealCommand}"/>
+                        <Button Classes="menuItem" Content="⚙️ Configuración"/>
+                    </StackPanel>
+                </SplitView.Pane>
+
+                <SplitView.Content>
+                    <TransitioningContentControl Content="{Binding CurrentContent}"/>
+                </SplitView.Content>
+            </SplitView>
+
+            <!-- Status Bar -->
+            <Border Grid.Row="2" Background="#EEEEEE" Height="30" BorderBrush="#CCCCCC" BorderThickness="0,1,0,0" Padding="10,0">
+                <Grid ColumnDefinitions="*,Auto">
+                     <TextBlock Grid.Column="0" Text="Listo" VerticalAlignment="Center" Foreground="#666666" FontSize="12"/>
+                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="15">
+                         <TextBlock Text="{Binding ConnectionStatus}" VerticalAlignment="Center" Foreground="#666666" FontSize="12"/>
+                         <TextBlock Text="{Binding AppVersion}" VerticalAlignment="Center" Foreground="#666666" FontSize="12"/>
+                     </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

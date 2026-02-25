@@ -1,0 +1,250 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KontrolSage.ViewModels"
+             xmlns:models="clr-namespace:KontrolSage.Models"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="780"
+             x:Class="KontrolSage.Views.DashboardKpiView"
+             x:DataType="vm:DashboardKpiViewModel">
+
+    <UserControl.Resources>
+        <vm:ColorToBrushConverter x:Key="ColorBrush"/>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="Border.kpi-card">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="BoxShadow" Value="0 2 10 0 #1A000000"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+        </Style>
+        <Style Selector="Border.kpi-card-accent">
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="BoxShadow" Value="0 2 10 0 #1A000000"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+        </Style>
+        <Style Selector="TextBlock.kpi-label">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="#9CA3AF"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <Style Selector="TextBlock.kpi-value">
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style Selector="TextBlock.kpi-index">
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+        <!-- ══ HEADER ══════════════════════════════════════════════════════ -->
+        <Border Grid.Row="0" Background="#0F172A" Padding="24,16">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="📊 Dashboard EVM" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock Text="{Binding NombreProyecto}" FontSize="14" Foreground="#94A3B8"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <TextBlock Text="Baseline:" Foreground="#94A3B8" VerticalAlignment="Center" FontSize="13"/>
+                    <ComboBox ItemsSource="{Binding Baselines}"
+                              SelectedItem="{Binding SelectedBaseline}"
+                              Width="90" Background="#1E293B" Foreground="White"/>
+                    <Button Content="🔄" Background="#1E293B" Foreground="White" Padding="10,8"
+                            CornerRadius="8" Command="{Binding RecalcularCommand}"
+                            ToolTip.Tip="Recalcular"/>
+                    <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}"
+                                 Width="60" Height="4" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ══ KPI CARDS ═══════════════════════════════════════════════════ -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Disabled" Padding="20,16,20,0">
+            <StackPanel Spacing="0">
+
+                <!-- Fila 1: Valores base -->
+                <WrapPanel Orientation="Horizontal" Margin="0,0,0,12">
+
+                    <!-- BAC -->
+                    <Border Classes="kpi-card" Width="165">
+                        <StackPanel>
+                            <TextBlock Classes="kpi-label" Text="BAC"/>
+                            <TextBlock Classes="kpi-value" Foreground="#334155"
+                                       Text="{Binding BAC, StringFormat='C0'}"/>
+                            <TextBlock Text="Budget at Completion" FontSize="10" Foreground="#CBD5E1"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- PV -->
+                    <Border Classes="kpi-card" Width="165">
+                        <StackPanel>
+                            <TextBlock Classes="kpi-label" Text="PV"/>
+                            <TextBlock Classes="kpi-value" Foreground="#2563EB"
+                                       Text="{Binding PV, StringFormat='C0'}"/>
+                            <TextBlock Text="Planned Value" FontSize="10" Foreground="#CBD5E1"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- EV -->
+                    <Border Classes="kpi-card" Width="165">
+                        <StackPanel>
+                            <TextBlock Classes="kpi-label" Text="EV"/>
+                            <TextBlock Classes="kpi-value" Foreground="#7C3AED"
+                                       Text="{Binding EV, StringFormat='C0'}"/>
+                            <TextBlock Text="Earned Value" FontSize="10" Foreground="#CBD5E1"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AC -->
+                    <Border Classes="kpi-card" Width="165">
+                        <StackPanel>
+                            <TextBlock Classes="kpi-label" Text="AC"/>
+                            <TextBlock Classes="kpi-value" Foreground="#DC2626"
+                                       Text="{Binding AC, StringFormat='C0'}"/>
+                            <TextBlock Text="Actual Cost" FontSize="10" Foreground="#CBD5E1"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- % Avance -->
+                    <Border Classes="kpi-card" Width="165">
+                        <StackPanel>
+                            <TextBlock Classes="kpi-label" Text="Avance"/>
+                            <TextBlock Classes="kpi-value" Foreground="#059669"
+                                       Text="{Binding PorcentajeAvance, StringFormat='{}{0:P1}'}"/>
+                            <TextBlock Text="% Ponderado EV/BAC" FontSize="10" Foreground="#CBD5E1"/>
+                        </StackPanel>
+                    </Border>
+
+                </WrapPanel>
+
+                <!-- Fila 2: Índices (con semáforo) -->
+                <WrapPanel Orientation="Horizontal" Margin="0,0,0,4">
+
+                    <!-- CPI -->
+                    <Border Classes="kpi-card-accent" Width="165"
+                            Background="{Binding CpiColor, Converter={StaticResource ColorBrush}}">
+                        <StackPanel>
+                            <TextBlock Classes="kpi-label" Text="CPI" Foreground="White"/>
+                            <TextBlock Classes="kpi-index" Foreground="White"
+                                       Text="{Binding CPI, StringFormat='N2'}"/>
+                            <TextBlock Text="Cost Perf. Index" FontSize="10" Foreground="#FFFFFF99"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- SPI -->
+                    <Border Classes="kpi-card-accent" Width="165"
+                            Background="{Binding SpiColor, Converter={StaticResource ColorBrush}}">
+                        <StackPanel>
+                            <TextBlock Classes="kpi-label" Text="SPI" Foreground="White"/>
+                            <TextBlock Classes="kpi-index" Foreground="White"
+                                       Text="{Binding SPI, StringFormat='N2'}"/>
+                            <TextBlock Text="Schedule Perf. Index" FontSize="10" Foreground="#FFFFFF99"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- CV -->
+                    <Border Classes="kpi-card-accent" Width="165"
+                            Background="{Binding CvColor, Converter={StaticResource ColorBrush}}">
+                        <StackPanel>
+                            <TextBlock Classes="kpi-label" Text="CV" Foreground="White"/>
+                            <TextBlock Classes="kpi-value" Foreground="White"
+                                       Text="{Binding CV, StringFormat='C0'}"/>
+                            <TextBlock Text="Cost Variance" FontSize="10" Foreground="#FFFFFF99"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- SV -->
+                    <Border Classes="kpi-card-accent" Width="165"
+                            Background="{Binding SvColor, Converter={StaticResource ColorBrush}}">
+                        <StackPanel>
+                            <TextBlock Classes="kpi-label" Text="SV" Foreground="White"/>
+                            <TextBlock Classes="kpi-value" Foreground="White"
+                                       Text="{Binding SV, StringFormat='C0'}"/>
+                            <TextBlock Text="Schedule Variance" FontSize="10" Foreground="#FFFFFF99"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- EAC -->
+                    <Border Classes="kpi-card" Width="165">
+                        <StackPanel>
+                            <TextBlock Classes="kpi-label" Text="EAC"/>
+                            <TextBlock Classes="kpi-value" Foreground="#92400E"
+                                       Text="{Binding EAC, StringFormat='C0'}"/>
+                            <TextBlock Text="Estimate at Completion" FontSize="10" Foreground="#CBD5E1"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- VAC -->
+                    <Border Classes="kpi-card" Width="165">
+                        <StackPanel>
+                            <TextBlock Classes="kpi-label" Text="VAC"/>
+                            <TextBlock Classes="kpi-value" Foreground="{Binding CvColor, Converter={StaticResource ColorBrush}}"
+                                       Text="{Binding VAC, StringFormat='C0'}"/>
+                            <TextBlock Text="Variance at Completion" FontSize="10" Foreground="#CBD5E1"/>
+                        </StackPanel>
+                    </Border>
+
+                </WrapPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ══ TABLA POR ACTIVIDAD ════════════════════════════════════════ -->
+        <Border Grid.Row="2" Margin="20,10,20,0"
+                BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8">
+            <DataGrid ItemsSource="{Binding Filas}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      GridLinesVisibility="Horizontal"
+                      RowBackground="White"
+                      CanUserResizeColumns="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Código" Binding="{Binding HierarchyCode}" Width="90"/>
+                    <DataGridTextColumn Header="Actividad" Binding="{Binding Nombre}" Width="*"/>
+                    <DataGridTextColumn Header="PV" Binding="{Binding PV, StringFormat='C0'}" Width="120"/>
+                    <DataGridTextColumn Header="EV" Binding="{Binding EV, StringFormat='C0'}" Width="120"/>
+                    <DataGridTextColumn Header="AC" Binding="{Binding AC, StringFormat='C0'}" Width="110"/>
+                    <DataGridTextColumn Header="CV" Binding="{Binding CV, StringFormat='C0'}" Width="110"/>
+                    <DataGridTextColumn Header="SV" Binding="{Binding SV, StringFormat='C0'}" Width="110"/>
+
+                    <!-- % Avance con barra de progreso -->
+                    <DataGridTemplateColumn Header="Avance" Width="140" IsReadOnly="True">
+                        <DataTemplate x:DataType="models:EvmRowResult">
+                            <Grid ColumnDefinitions="*,45" VerticalAlignment="Center" Margin="4,0">
+                                <ProgressBar Grid.Column="0" Value="{Binding PorcentajeAvance}"
+                                             Minimum="0" Maximum="1"
+                                             Height="8" CornerRadius="4"/>
+                                <TextBlock Grid.Column="1" Text="{Binding PorcentajeAvance, StringFormat='{}{0:P0}'}"
+                                           FontSize="11" Margin="6,0,0,0" VerticalAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- CPI por fila -->
+                    <DataGridTemplateColumn Header="CPI" Width="70" IsReadOnly="True">
+                        <DataTemplate x:DataType="models:EvmRowResult">
+                            <TextBlock Text="{Binding CPI, StringFormat='N2'}"
+                                       FontWeight="SemiBold" VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- ══ FOOTER ══════════════════════════════════════════════════════ -->
+        <Border Grid.Row="3" Background="#F8FAFC" Padding="20,10"
+                BorderBrush="#E5E7EB" BorderThickness="0,1,0,0">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="#6B7280"/>
+        </Border>
+
+    </Grid>
+</UserControl>

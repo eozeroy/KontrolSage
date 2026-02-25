@@ -1,0 +1,95 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KontrolSage.ViewModels"
+             xmlns:models="clr-namespace:KontrolSage.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="KontrolSage.Views.EdtView"
+             x:DataType="vm:EdtViewModel">
+
+    <Grid RowDefinitions="Auto, *">
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#F0F0F0" Padding="20">
+            <StackPanel>
+                <TextBlock Text="Estructura de Desglose de Trabajo (EDT)" FontSize="24" FontWeight="Bold" Foreground="#333"/>
+                <TextBlock Text="{Binding ProjectName, StringFormat='Proyecto: {0}'}" FontSize="16" Foreground="#666" Margin="0,5,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content area Split -->
+        <Grid Grid.Row="1" ColumnDefinitions="2*, 1*">
+            <!-- Tree View for EDT -->
+            <Border Grid.Column="0" Margin="20" Background="White" CornerRadius="8" BoxShadow="0 2 10 0 LightGray">
+                <Grid RowDefinitions="Auto, *">
+                    <TextBlock Grid.Row="0" Text="Estructura Actual" FontWeight="SemiBold" FontSize="16" Margin="15,15,15,5"/>
+                    <TreeView Grid.Row="1" ItemsSource="{Binding Nodes}" SelectedItem="{Binding SelectedNode}" Margin="10">
+                        <TreeView.DataTemplates>
+                            <TreeDataTemplate DataType="{x:Type models:EdtNode}" ItemsSource="{Binding Children}">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock Text="{Binding HierarchyCode}" FontWeight="Bold" Foreground="#D84315" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Medium"/>
+                                    <!-- Display assigned Account if any -->
+                                    <Border Background="#FFF3E0" CornerRadius="4" Padding="5,2" IsVisible="{Binding AssignedEdcNode, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <TextBlock Text="{Binding AssignedEdcNode.Description, StringFormat='[Cuenta: {0}]'}" FontSize="12" Foreground="#E65100"/>
+                                    </Border>
+                                </StackPanel>
+                            </TreeDataTemplate>
+                        </TreeView.DataTemplates>
+                    </TreeView>
+                </Grid>
+            </Border>
+
+            <!-- Editor / Actions Pane -->
+            <Border Grid.Column="1" Margin="0,20,20,20" Background="White" CornerRadius="8" BoxShadow="0 2 10 0 LightGray" Padding="20">
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Gestión de Paquete de Trabajo" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
+                    
+                    <TextBlock Text="Nombre del Paquete:" FontSize="12" Foreground="#666"/>
+                    <TextBox Text="{Binding NewName}" Watermark="Ej. Cimentación"/>
+                    
+                    <StackPanel IsVisible="{Binding CanAssignAccount}">
+                        <TextBlock Text="Cuenta Asignada (EDC):" FontSize="12" Foreground="#666" Margin="0,15,0,0"/>
+                        <ComboBox ItemsSource="{Binding AvailableAccounts}" 
+                                  SelectedItem="{Binding SelectedAccount}"
+                                  DisplayMemberBinding="{Binding Description}"
+                                  PlaceholderText="Selecciona una Cuenta"
+                                  HorizontalAlignment="Stretch" Margin="0,5,0,0"/>
+                    </StackPanel>
+                    
+                    <TextBlock Text="No se puede firmar responsable ni cuenta a nodos que agrupan otras sub-tareas." 
+                               Foreground="#C62828" FontSize="11" TextWrapping="Wrap"
+                               IsVisible="{Binding !CanAssignAccount}" Margin="0,10,0,0"
+                               ToolTip.Tip="Solo los nodos finales (hojas) de la EDT pueden conectarse con Cuentas EDC."/>
+                    
+                    <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto" Margin="0,20,0,0">
+                        <!-- Add actions -->
+                        <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="➕ Agregar Paquete Raíz" 
+                                Command="{Binding AddRootNodeCommand}" HorizontalAlignment="Stretch" Margin="0,0,0,10"
+                                IsVisible="{Binding !IsEditing}"/>
+                                
+                        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="↳ Agregar Sub-Paquete" 
+                                Command="{Binding AddChildNodeCommand}" HorizontalAlignment="Stretch" Margin="0,0,0,10"
+                                IsVisible="{Binding !IsEditing}" IsEnabled="{Binding SelectedNode, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                                
+                        <!-- Edit actions -->
+                        <Button Grid.Row="0" Grid.Column="0" Content="💾 Guardar" 
+                                Command="{Binding SaveEditCommand}" HorizontalAlignment="Stretch" Margin="0,0,5,10"
+                                IsVisible="{Binding IsEditing}"/>
+                        <Button Grid.Row="0" Grid.Column="1" Content="❌ Cancelar" 
+                                Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" Margin="5,0,0,10"
+                                IsVisible="{Binding IsEditing}"/>
+
+                        <Button Grid.Row="2" Grid.Column="0" Content="✏️ Editar" 
+                                Command="{Binding BeginEditCommand}" HorizontalAlignment="Stretch" Margin="0,0,5,0"
+                                IsVisible="{Binding !IsEditing}" IsEnabled="{Binding SelectedNode, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                                
+                        <Button Grid.Row="2" Grid.Column="1" Content="🗑️ Eliminar" 
+                                Command="{Binding DeleteNodeCommand}" HorizontalAlignment="Stretch" Margin="5,0,0,0" Background="#FFEbee" Foreground="#C62828"
+                                IsVisible="{Binding !IsEditing}" IsEnabled="{Binding SelectedNode, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

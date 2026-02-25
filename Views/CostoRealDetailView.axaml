@@ -1,0 +1,230 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KontrolSage.ViewModels"
+             xmlns:models="clr-namespace:KontrolSage.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="700"
+             x:Class="KontrolSage.Views.CostoRealDetailView"
+             x:DataType="vm:CostoRealDetailViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.label">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#6B7280"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <Style Selector="Border.section">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="20,16"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="BoxShadow" Value="0 1 4 0 #14000000"/>
+        </Style>
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Margin" Value="0,0,0,14"/>
+        </Style>
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#007ACC"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+        <Style Selector="Button.secondary">
+            <Setter Property="Background" Value="#F3F4F6"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- HEADER -->
+        <Border Grid.Row="0" Background="#007ACC" Padding="20,14">
+            <StackPanel Spacing="2">
+                <TextBlock FontSize="20" FontWeight="Bold" Foreground="White"
+                           Text="Nuevo Costo Real"
+                           IsVisible="{Binding IsNew}"/>
+                <TextBlock FontSize="20" FontWeight="Bold" Foreground="White"
+                           Text="Editar Costo Real"
+                           IsVisible="{Binding IsNew, Converter={x:Static BoolConverters.Not}}"/>
+                <TextBlock Text="Capture los datos del gasto real incurrido"
+                           FontSize="12" Foreground="#BFE3FF"/>
+            </StackPanel>
+        </Border>
+
+        <!-- FORM BODY -->
+        <ScrollViewer Grid.Row="1" Padding="20,16">
+            <StackPanel Spacing="0" MaxWidth="760">
+
+                <!-- ── SECCIÓN 1: Datos obligatorios ─────────────────── -->
+                <Border Classes="section">
+                    <StackPanel>
+                        <TextBlock Classes="section-title" Text="📋 Datos Obligatorios"/>
+                        <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,16,Auto">
+
+                            <!-- Fecha -->
+                            <StackPanel Grid.Row="0" Grid.Column="0">
+                                <TextBlock Classes="label" Text="Fecha del documento *"/>
+                                <CalendarDatePicker SelectedDate="{Binding Fecha}" HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+
+                            <!-- Cuenta EDC -->
+                            <StackPanel Grid.Row="0" Grid.Column="2">
+                                <TextBlock Classes="label" Text="Cuenta EDC (hoja) *"/>
+                                <ComboBox ItemsSource="{Binding EdcHojas}"
+                                          SelectedItem="{Binding SelectedEdcNode}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:EdcNode">
+                                            <TextBlock>
+                                                <Run Text="{Binding HierarchyCode}" FontWeight="SemiBold"/>
+                                                <Run Text=" – "/>
+                                                <Run Text="{Binding Description}"/>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- Importe -->
+                            <StackPanel Grid.Row="2" Grid.Column="0">
+                                <TextBlock Classes="label" Text="Importe (sin IVA) *"/>
+                                <NumericUpDown Value="{Binding Importe}"
+                                               Minimum="0" Maximum="999999999999"
+                                               FormatString="N2" Increment="100"
+                                               HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+
+                            <!-- IVA + Total -->
+                            <StackPanel Grid.Row="2" Grid.Column="2">
+                                <TextBlock Classes="label" Text="IVA"/>
+                                <NumericUpDown Value="{Binding IVA}"
+                                               Minimum="0" Maximum="999999999"
+                                               FormatString="N2" Increment="10"
+                                               HorizontalAlignment="Stretch"/>
+                                <Border Background="#F0FDF4" CornerRadius="6" Padding="12,8" Margin="0,8,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Total con IVA:" FontWeight="SemiBold" Foreground="#166534"/>
+                                        <TextBlock Text="{Binding ImporteTotal, StringFormat='C2'}"
+                                                   FontSize="18" FontWeight="Bold" Foreground="#16A34A"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── SECCIÓN 2: Clasificación ──────────────────────── -->
+                <Border Classes="section">
+                    <StackPanel>
+                        <TextBlock Classes="section-title" Text="🏷️ Clasificación"/>
+                        <Grid ColumnDefinitions="*,20,*">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Classes="label" Text="Tipo de Recurso"/>
+                                <ComboBox ItemsSource="{Binding TiposRecurso}"
+                                          SelectedItem="{Binding TipoRecurso}"
+                                          HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Classes="label" Text="Estado"/>
+                                <ComboBox ItemsSource="{Binding Estados}"
+                                          SelectedItem="{Binding Estado}"
+                                          HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── SECCIÓN 3: Referencias documentales ───────────── -->
+                <Border Classes="section">
+                    <StackPanel>
+                        <TextBlock Classes="section-title" Text="📄 Referencias Documentales"/>
+                        <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,16,Auto">
+                            <StackPanel Grid.Row="0" Grid.Column="0">
+                                <TextBlock Classes="label" Text="Número de Factura / CFDI"/>
+                                <TextBox Text="{Binding NumeroFactura}" Watermark="Ej: F-00123"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="2">
+                                <TextBlock Classes="label" Text="Número de Póliza"/>
+                                <TextBox Text="{Binding NumeroPoliza}" Watermark="Ej: POL-2025-001"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="0">
+                                <TextBlock Classes="label" Text="Proveedor / Contratista"/>
+                                <TextBox Text="{Binding Proveedor}" Watermark="Nombre del proveedor"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="2">
+                                <TextBlock Classes="label" Text="RFC del Proveedor"/>
+                                <TextBox Text="{Binding RFC}" Watermark="Ej: POL990101ABC"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── SECCIÓN 4: Detalle del recurso (opcional) ─────── -->
+                <Border Classes="section">
+                    <StackPanel>
+                        <TextBlock Classes="section-title" Text="📦 Detalle del Recurso (Opcional)"/>
+                        <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,16,Auto">
+                            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+                                <TextBlock Classes="label" Text="Concepto / Descripción"/>
+                                <TextBox Text="{Binding Concepto}" Watermark="Descripción del gasto…"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="0">
+                                <TextBlock Classes="label" Text="Cantidad"/>
+                                <NumericUpDown Value="{Binding Cantidad}"
+                                               Minimum="0" Maximum="999999999"
+                                               FormatString="N4" Increment="1"
+                                               HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="2">
+                                <TextBlock Classes="label" Text="Unidad"/>
+                                <TextBox Text="{Binding Unidad}" Watermark="m³, hr, kg…"/>
+                                <!-- Precio unitario calculado -->
+                                <TextBlock FontSize="11" Foreground="#6B7280" Margin="0,6,0,0"
+                                           IsVisible="{Binding Cantidad, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <Run Text="PU real: "/>
+                                    <Run Text="{Binding PrecioUnitarioReal, StringFormat='C4'}" FontWeight="SemiBold"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Margin="0,16,0,0">
+                            <TextBlock Classes="label" Text="Notas"/>
+                            <TextBox Text="{Binding Notas}" Watermark="Observaciones…" Height="60" AcceptsReturn="True"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Error -->
+                <Border Background="#FEF2F2" CornerRadius="6" Padding="12,8"
+                        IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC2626" FontWeight="SemiBold"/>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- FOOTER BOTONES -->
+        <Border Grid.Row="2" Background="#F9FAFB" Padding="20,12"
+                BorderBrush="#E5E7EB" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}"
+                             Width="80" Height="4" VerticalAlignment="Center"/>
+                <Button Classes="secondary" Content="Cancelar" Command="{Binding CancelarCommand}"/>
+                <Button Classes="primary" Content="💾 Guardar" Command="{Binding GuardarCommand}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

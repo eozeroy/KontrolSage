@@ -1,0 +1,144 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KontrolSage.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="KontrolSage.Views.MasterCatalogView"
+             x:DataType="vm:MasterCatalogViewModel">
+
+    <Grid>
+        <!-- MAIN LIST VIEW -->
+        <Grid IsVisible="{Binding CurrentEditor, Converter={x:Static ObjectConverters.IsNull}}" RowDefinitions="Auto, *">
+                    <!-- Header & Search -->
+                    <Border Grid.Row="0" Background="White" Padding="20" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <StackPanel Grid.Column="0" Spacing="5">
+                                <TextBlock Text="Catálogo Maestro APU" FontSize="24" FontWeight="Bold" Foreground="#333"/>
+                                <TextBlock Text="Gestiona los Precios Unitarios Globales (Materiales, Mano de Obra, Matrices)" FontSize="14" Foreground="#666"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                <TextBox Text="{Binding SearchText}" Watermark="Buscar matriz por código o descripción..." Width="300"/>
+                                <Button Content="Buscar" Command="{Binding ExecuteSearchCommand}" Background="#007ACC" Foreground="White"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Data Tabs -->
+                    <Grid Grid.Row="1" Margin="20">
+                         <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0,-20,0,0"/>
+
+                         <TabControl Background="Transparent">
+                             <!-- TAB: MATRICES APU -->
+                             <TabItem Header="Matrices y Analisis (APU)" FontSize="16">
+                                 <Grid RowDefinitions="Auto,*" Margin="0,10,0,0">
+                                     <Button Grid.Row="0" Content="+ Nueva Matriz" Command="{Binding NuevaMatrizCommand}" Background="#28A745" Foreground="White" HorizontalAlignment="Right" Margin="0,0,0,10"/>
+                                     
+                                     <Border Grid.Row="1" Background="White" CornerRadius="5" Padding="0" BorderBrush="#E0E0E0" BorderThickness="1">
+                                         <Grid RowDefinitions="Auto,*">
+                                             <!-- List Header -->
+                                             <Border Grid.Row="0" Background="#F8F9FA" Padding="15,10" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                                                 <Grid ColumnDefinitions="2*, 5*, 1*, 2*, Auto">
+                                                     <TextBlock Grid.Column="0" Text="Código" FontWeight="Bold" Foreground="#555"/>
+                                                     <TextBlock Grid.Column="1" Text="Descripción" FontWeight="Bold" Foreground="#555"/>
+                                                     <TextBlock Grid.Column="2" Text="Unidad" FontWeight="Bold" Foreground="#555"/>
+                                                     <TextBlock Grid.Column="3" Text="Costo Directo" FontWeight="Bold" Foreground="#555" HorizontalAlignment="Right" Margin="0,0,10,0"/>
+                                                     <TextBlock Grid.Column="4" Text="Acciones" FontWeight="Bold" Foreground="#555" Width="100" TextAlignment="Center"/>
+                                                 </Grid>
+                                             </Border>
+
+                                             <!-- Items -->
+                                             <ListBox Grid.Row="1" ItemsSource="{Binding MatrizCatalogSource}" Background="Transparent" BorderThickness="0">
+                                                 <ListBox.Styles>
+                                                     <Style Selector="ListBoxItem">
+                                                         <Setter Property="Padding" Value="0"/>
+                                                         <Setter Property="Margin" Value="0"/>
+                                                         <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                                         <Setter Property="BorderBrush" Value="#EEEEEE"/>
+                                                     </Style>
+                                                 </ListBox.Styles>
+                                                 <ListBox.ItemTemplate>
+                                                     <DataTemplate>
+                                                         <Border Padding="15,10" Background="Transparent">
+                                                             <Grid ColumnDefinitions="2*, 5*, 1*, 2*, Auto">
+                                                                 <TextBlock Grid.Column="0" Text="{Binding CodigoInterno}" VerticalAlignment="Center"/>
+                                                                 <TextBlock Grid.Column="1" Text="{Binding DescripcionConcepto}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                                                 <TextBlock Grid.Column="2" Text="{Binding UnidadAnalisis}" VerticalAlignment="Center"/>
+                                                                 <TextBlock Grid.Column="3" Text="{Binding CostoDirectoTotal, StringFormat='c'}" VerticalAlignment="Center" HorizontalAlignment="Right" FontWeight="SemiBold" Margin="0,0,10,0"/>
+                                                                 
+                                                                 <StackPanel Grid.Column="4" Orientation="Horizontal" Width="100" Spacing="5" HorizontalAlignment="Right">
+                                                                    <Button Content="📝" ToolTip.Tip="Editar" Command="{Binding $parent[UserControl].((vm:MasterCatalogViewModel)DataContext).EditarMatrizCommand}" CommandParameter="{Binding}" Background="Transparent"/>
+                                                                    <Button Content="🗑️" ToolTip.Tip="Eliminar" Command="{Binding $parent[UserControl].((vm:MasterCatalogViewModel)DataContext).EliminarMatrizCommand}" CommandParameter="{Binding}" Background="Transparent"/>
+                                                                 </StackPanel>
+                                                             </Grid>
+                                                         </Border>
+                                                     </DataTemplate>
+                                                 </ListBox.ItemTemplate>
+                                             </ListBox>
+                                         </Grid>
+                                     </Border>
+                                 </Grid>
+                             </TabItem>
+
+                             <!-- TAB: INSUMOS BASICOS -->
+                             <TabItem Header="Insumos Básicos" FontSize="16">
+                                 <Grid RowDefinitions="Auto,*" Margin="0,10,0,0">
+                                     <Button Grid.Row="0" Content="+ Nuevo Insumo" Command="{Binding NuevoInsumoCommand}" Background="#28A745" Foreground="White" HorizontalAlignment="Right" Margin="0,0,0,10"/>
+                                     
+                                     <Border Grid.Row="1" Background="White" CornerRadius="5" Padding="0" BorderBrush="#E0E0E0" BorderThickness="1">
+                                         <Grid RowDefinitions="Auto,*">
+                                             <!-- List Header -->
+                                             <Border Grid.Row="0" Background="#F8F9FA" Padding="15,10" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                                                 <Grid ColumnDefinitions="1.5*, 4*, 1.5*, 1*, 1.5*, Auto">
+                                                     <TextBlock Grid.Column="0" Text="Código" FontWeight="Bold" Foreground="#555"/>
+                                                     <TextBlock Grid.Column="1" Text="Descripción" FontWeight="Bold" Foreground="#555"/>
+                                                     <TextBlock Grid.Column="2" Text="Tipo" FontWeight="Bold" Foreground="#555"/>
+                                                     <TextBlock Grid.Column="3" Text="Unidad" FontWeight="Bold" Foreground="#555"/>
+                                                     <TextBlock Grid.Column="4" Text="Costo Base" FontWeight="Bold" Foreground="#555" HorizontalAlignment="Right" Margin="0,0,10,0"/>
+                                                     <TextBlock Grid.Column="5" Text="Acciones" FontWeight="Bold" Foreground="#555" Width="100" TextAlignment="Center"/>
+                                                 </Grid>
+                                             </Border>
+
+                                             <!-- Items -->
+                                             <ListBox Grid.Row="1" ItemsSource="{Binding InsumoCatalogSource}" Background="Transparent" BorderThickness="0">
+                                                 <ListBox.Styles>
+                                                     <Style Selector="ListBoxItem">
+                                                         <Setter Property="Padding" Value="0"/>
+                                                         <Setter Property="Margin" Value="0"/>
+                                                         <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                                         <Setter Property="BorderBrush" Value="#EEEEEE"/>
+                                                     </Style>
+                                                 </ListBox.Styles>
+                                                 <ListBox.ItemTemplate>
+                                                     <DataTemplate>
+                                                         <Border Padding="15,10" Background="Transparent">
+                                                             <Grid ColumnDefinitions="1.5*, 4*, 1.5*, 1*, 1.5*, Auto">
+                                                                 <TextBlock Grid.Column="0" Text="{Binding ClaveExterna}" VerticalAlignment="Center"/>
+                                                                 <TextBlock Grid.Column="1" Text="{Binding Descripcion}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                                                 <TextBlock Grid.Column="2" Text="{Binding Tipo}" VerticalAlignment="Center"/>
+                                                                 <TextBlock Grid.Column="3" Text="{Binding Unidad}" VerticalAlignment="Center"/>
+                                                                 <TextBlock Grid.Column="4" Text="{Binding CostoBase, StringFormat='c'}" VerticalAlignment="Center" HorizontalAlignment="Right" FontWeight="SemiBold" Margin="0,0,10,0"/>
+
+                                                                 <StackPanel Grid.Column="5" Orientation="Horizontal" Width="100" Spacing="5" HorizontalAlignment="Right">
+                                                                    <Button Content="📝" ToolTip.Tip="Editar" Command="{Binding $parent[UserControl].((vm:MasterCatalogViewModel)DataContext).EditarInsumoCommand}" CommandParameter="{Binding}" Background="Transparent"/>
+                                                                    <Button Content="🗑️" ToolTip.Tip="Eliminar" Command="{Binding $parent[UserControl].((vm:MasterCatalogViewModel)DataContext).EliminarInsumoCommand}" CommandParameter="{Binding}" Background="Transparent"/>
+                                                                 </StackPanel>
+                                                             </Grid>
+                                                         </Border>
+                                                     </DataTemplate>
+                                                 </ListBox.ItemTemplate>
+                                             </ListBox>
+                                         </Grid>
+                                     </Border>
+                                 </Grid>
+                             </TabItem>
+         </TabControl>
+                    </Grid>
+        </Grid>
+
+        <!-- EDITOR VIEW -->
+        <ContentControl Content="{Binding CurrentEditor}" 
+                        IsVisible="{Binding CurrentEditor, Converter={x:Static ObjectConverters.IsNotNull}}" />
+    </Grid>
+</UserControl>

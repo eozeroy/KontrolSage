@@ -1,0 +1,134 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KontrolSage.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="700"
+             x:Class="KontrolSage.Views.DirectCostDetailView"
+             x:DataType="vm:DirectCostDetailViewModel">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="20">
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="{Binding AssociatedNode.Name, StringFormat='Análisis de Costo por Actividad | EDT: {0}'}" FontSize="24" FontWeight="Bold" Foreground="#333" Margin="0,0,0,15"/>
+
+        <!-- Formular Top - Activity Metadata -->
+        <Border Grid.Row="1" Background="#F8F9FA" Padding="15" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,15">
+            <Grid RowDefinitions="Auto, Auto">
+                <Grid Grid.Row="0" ColumnDefinitions="*,*,*,*,*,*" Margin="0,0,0,10">
+                    <StackPanel Grid.Column="0" Spacing="5" Margin="0,0,10,0">
+                        <TextBlock Text="Cantidad"/>
+                        <TextBox Text="{Binding Cantidad}" IsEnabled="{Binding IsEditable}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="5" Margin="0,0,10,0">
+                        <TextBlock Text="Unidad"/>
+                        <TextBox Text="{Binding Unidad}" IsEnabled="{Binding IsEditable}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Spacing="5" Margin="0,0,10,0">
+                        <TextBlock Text="Inicio"/>
+                        <DatePicker SelectedDate="{Binding Inicio}" IsEnabled="{Binding IsEditable}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="3" Spacing="5" Margin="0,0,10,0">
+                        <TextBlock Text="Fin"/>
+                        <DatePicker SelectedDate="{Binding Fin}" IsEnabled="{Binding IsEditable}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="4" Spacing="5" Margin="0,0,10,0">
+                        <TextBlock Text="Tipo"/>
+                        <ComboBox ItemsSource="{Binding TiposConceptos}" SelectedItem="{Binding TipoConcepto}" IsEnabled="{Binding IsEditable}" HorizontalAlignment="Stretch"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="5" Spacing="5">
+                        <TextBlock Text="Distribución"/>
+                        <ComboBox ItemsSource="{Binding TiposDistribucion}" SelectedItem="{Binding Distribucion}" IsEnabled="{Binding IsEditable}" HorizontalAlignment="Stretch"/>
+                    </StackPanel>
+                </Grid>
+                <StackPanel Grid.Row="1" Spacing="5">
+                    <TextBlock Text="Notas / Justificación"/>
+                    <TextBox Text="{Binding Notas}" AcceptsReturn="True" Height="40" IsEnabled="{Binding IsEditable}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Composition Editor -->
+        <Border Grid.Row="2" Background="White" Padding="0" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="5">
+            <Grid RowDefinitions="Auto,*">
+                
+                <!-- Search Bar Add Resource -->
+                <Border Grid.Row="0" Padding="15" Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" IsVisible="{Binding IsEditable}">
+                     <Grid ColumnDefinitions="Auto, *, Auto">
+                         <TextBlock Grid.Column="0" Text="Asignar Recursos" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,20,0"/>
+
+                         <!-- Inline Add Search -->
+                         <Grid Grid.Column="1" ColumnDefinitions="*, Auto" HorizontalAlignment="Left" Width="500">
+                             <TextBox Grid.Column="0" Text="{Binding SearchText}" Watermark="Buscar código de Insumo o Matriz APU..." VerticalAlignment="Center"/>
+                             <Button Grid.Column="1" Content="Buscar" Command="{Binding SearchCatalogCommand}" CommandParameter="{Binding SearchText}" Margin="5,0,0,0"/>
+                         </Grid>                   
+                    </Grid>
+                </Border>
+
+                <!-- Search Results Overlay -->
+                <!-- Ideally this is a Flyout or Popup. For MVP, we overlay a ListBox if searching -->
+                <ListBox Grid.Row="1" ItemsSource="{Binding SearchResults}" IsVisible="{Binding SearchResults.Count}" VerticalAlignment="Top" ZIndex="10" Background="White" BorderBrush="#007ACC" BorderThickness="2" MaxHeight="200" Margin="15,0,15,0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <!-- Handling both Insumo and Matriz items slightly differently in display could be done via templates, but basic bindings will ToString if not matched, or we use multibinding. For MVP, assuming they share enough or we show raw. Wait, ClaveExterna is Insumo, CodigoInterno is Matriz. Both have Descripcion/DescripcionConcepto. Let's make it simpler: rely on the code behind to format or just use the AddRecurso command to handle the logic. -->
+                            <!-- Since we don't have polymorphic bindings easily here without converters, we assume the command handles it and we show a generic button -->
+                            <Grid ColumnDefinitions="*,Auto" Margin="5">
+                                <TextBlock Grid.Column="0" Text="{Binding}"/> <!-- Will call ToString, ensure Models override ToString OR write a generic Converter -->
+                                <Button Grid.Column="1" Content="Añadir a Actividad" Command="{Binding $parent[UserControl].((vm:DirectCostDetailViewModel)DataContext).AddRecursoCommand}" CommandParameter="{Binding}" Background="#28A745" Foreground="White" Padding="5,2" FontSize="12"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Compositon Grid -->
+                <DataGrid Grid.Row="1" Margin="0"
+                          ItemsSource="{Binding RecursosAsignadosSource}"
+                          AutoGenerateColumns="False" 
+                          IsReadOnly="{Binding !IsEditable}"
+                          GridLinesVisibility="All"
+                          BorderThickness="0"
+                          RowBackground="White">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Código" Binding="{Binding CodigoRecurso}" IsReadOnly="True" Width="1.5*"/>
+                        <DataGridTextColumn Header="Descripción" Binding="{Binding DescripcionRecurso}" IsReadOnly="True" Width="3*"/>
+                        <DataGridTextColumn Header="Tipo" Binding="{Binding TipoRecurso}" IsReadOnly="True" Width="1*"/>
+                        
+                        <!-- Editable Columns if not frozen -->
+                        <DataGridTextColumn Header="Rendimiento (hrs/jls)" Binding="{Binding Rendimiento, StringFormat='N4'}" Width="1.5*"/>
+                        <DataGridTextColumn Header="Cant. Form." Binding="{Binding CantidadTotalFormulada, StringFormat='N2'}" IsReadOnly="True" Width="1.2*"/>
+                        <DataGridTextColumn Header="PU" Binding="{Binding CostoUnitarioSnapshot, StringFormat='C2'}" IsReadOnly="True" Width="1.5*"/>
+                        <DataGridTextColumn Header="Importe" Binding="{Binding ImporteTotal, StringFormat='C2'}" IsReadOnly="True" Width="1.5*"/>
+                        
+                        <DataGridTemplateColumn Header=" " Width="60">
+                            <DataTemplate>
+                                <Button Content="X" ToolTip.Tip="Eliminar" Foreground="#D9534F" Background="Transparent" 
+                                        Command="{Binding $parent[UserControl].((vm:DirectCostDetailViewModel)DataContext).RemoveRecursoCommand}"
+                                        CommandParameter="{Binding}"
+                                        IsVisible="{Binding $parent[UserControl].((vm:DirectCostDetailViewModel)DataContext).IsEditable}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- Footer Acciones y Total -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Margin="0,20,0,0">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                 <!-- Boton manual para forzar recalculo en UI tonta -->
+                 <Button Content="Recalcular Importes" Command="{Binding RecalcularTotalCommand}"/>
+                 <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}"/>
+                 <TextBlock Text="⚠ Línea Base Original congelada. Edición deshabilitada." Foreground="#D9534F" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,0,0" IsVisible="{Binding IsFrozen}"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <TextBlock Text="Costo Directo Total:" VerticalAlignment="Center" FontSize="16"/>
+                    <TextBlock Text="{Binding CostoDirectoTotal, StringFormat='c'}" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#007ACC"/>
+                </StackPanel>
+
+                <Button Content="Regresar" Command="{Binding CancelCommand}" Width="100" HorizontalContentAlignment="Center"/>
+                <Button Content="Guardar Cambios" Command="{Binding SaveCommand}" Background="#007ACC" Foreground="White" Width="140" HorizontalContentAlignment="Center" IsEnabled="{Binding IsEditable}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

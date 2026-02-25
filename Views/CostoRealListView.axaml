@@ -1,0 +1,203 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KontrolSage.ViewModels"
+             xmlns:models="clr-namespace:KontrolSage.Models"
+             mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="750"
+             x:Class="KontrolSage.Views.CostoRealListView"
+             x:DataType="vm:CostoRealListViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="BoxShadow" Value="0 2 8 0 #18000000"/>
+        </Style>
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#007ACC"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="16,9"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+        <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#005FA3"/>
+        </Style>
+        <Style Selector="Button.secondary">
+            <Setter Property="Background" Value="#F3F4F6"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Padding" Value="14,9"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+        <Style Selector="Button.icon-edit">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style Selector="Button.icon-delete">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#DC2626"/>
+            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <!-- MAIN LIST -->
+        <Grid IsVisible="{Binding CurrentEditor, Converter={x:Static ObjectConverters.IsNull}}"
+              RowDefinitions="Auto,Auto,*,Auto">
+
+            <!-- HEADER -->
+            <Border Grid.Row="0" Background="#007ACC" Padding="20,14">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="💵 Costo Real (AC)" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Gastos reales incurridos por cuenta EDC · CRUD completo"
+                                   FontSize="12" Foreground="#BFE3FF"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <Border Classes="card" Width="155">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Total (sin IVA)" FontSize="11" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding TotalImporte, StringFormat='{}{0:C2}'}"
+                                           FontSize="18" FontWeight="Bold" Foreground="#007ACC"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Classes="card" Width="130">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="IVA" FontSize="11" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding TotalIVA, StringFormat='{}{0:C2}'}"
+                                           FontSize="18" FontWeight="Bold" Foreground="#6B7280"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Classes="card" Width="155">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Total con IVA" FontSize="11" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding TotalConIVA, StringFormat='{}{0:C2}'}"
+                                           FontSize="18" FontWeight="Bold" Foreground="#059669"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Classes="card" Width="90">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Registros" FontSize="11" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding TotalRegistros}"
+                                           FontSize="22" FontWeight="Bold" Foreground="#374151"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- FILTROS -->
+            <Border Grid.Row="1" Background="#F9FAFB" Padding="20,10" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+                <WrapPanel Orientation="Horizontal" ItemWidth="200">
+                    <!-- Fecha Desde -->
+                    <StackPanel Margin="0,0,16,4" Spacing="3">
+                        <TextBlock Text="Desde" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280"/>
+                        <CalendarDatePicker SelectedDate="{Binding FechaDesde}" Width="140"/>
+                    </StackPanel>
+                    <!-- Fecha Hasta -->
+                    <StackPanel Margin="0,0,16,4" Spacing="3">
+                        <TextBlock Text="Hasta" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280"/>
+                        <CalendarDatePicker SelectedDate="{Binding FechaHasta}" Width="140"/>
+                    </StackPanel>
+                    <!-- Cuenta EDC -->
+                    <StackPanel Margin="0,0,16,4" Width="220" Spacing="3">
+                        <TextBlock Text="Cuenta EDC" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280"/>
+                        <ComboBox ItemsSource="{Binding EdcHojas}"
+                                  SelectedItem="{Binding FiltroEdcNode}"
+                                  Width="220" PlaceholderText="— Todas —">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:EdcNode">
+                                    <TextBlock Text="{Binding HierarchyCode}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                    <!-- Tipo Recurso -->
+                    <StackPanel Margin="0,0,16,4" Width="140" Spacing="3">
+                        <TextBlock Text="Tipo Recurso" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280"/>
+                        <ComboBox ItemsSource="{Binding TiposRecursoFiltro}"
+                                  SelectedItem="{Binding FiltroTipoRecurso}"
+                                  Width="140" PlaceholderText="— Todos —"/>
+                    </StackPanel>
+                    <!-- Estado -->
+                    <StackPanel Margin="0,0,16,4" Width="140" Spacing="3">
+                        <TextBlock Text="Estado" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280"/>
+                        <ComboBox ItemsSource="{Binding EstadosFiltro}"
+                                  SelectedItem="{Binding FiltroEstado}"
+                                  Width="140" PlaceholderText="— Todos —"/>
+                    </StackPanel>
+                    <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}"
+                                 Width="80" Height="4" VerticalAlignment="Bottom" Margin="0,0,0,8"/>
+                </WrapPanel>
+            </Border>
+
+            <!-- TABLA -->
+            <DataGrid Grid.Row="2" Margin="20,10,20,0"
+                      ItemsSource="{Binding Costos}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      GridLinesVisibility="Horizontal"
+                      BorderThickness="1" BorderBrush="#E5E7EB"
+                      RowBackground="White"
+                      CanUserResizeColumns="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat='dd/MM/yyyy'}" Width="95"/>
+                    <DataGridTextColumn Header="Cuenta EDC" Binding="{Binding EdcNodeId}" Width="120"/>
+                    <DataGridTextColumn Header="Tipo" Binding="{Binding TipoRecurso}" Width="110"/>
+                    <DataGridTextColumn Header="Proveedor" Binding="{Binding Proveedor}" Width="150"/>
+                    <DataGridTextColumn Header="Factura" Binding="{Binding NumeroFactura}" Width="100"/>
+                    <DataGridTextColumn Header="Póliza" Binding="{Binding NumeroPoliza}" Width="90"/>
+                    <DataGridTextColumn Header="Concepto" Binding="{Binding Concepto}" Width="*"/>
+                    <DataGridTextColumn Header="Importe" Binding="{Binding Importe, StringFormat='C2'}" Width="115"/>
+                    <DataGridTextColumn Header="IVA" Binding="{Binding IVA, StringFormat='C2'}" Width="100"/>
+                    <DataGridTextColumn Header="Total" Binding="{Binding ImporteTotal, StringFormat='C2'}" Width="115"/>
+
+                    <!-- Estado con color -->
+                    <DataGridTemplateColumn Header="Estado" Width="110" IsReadOnly="True">
+                        <DataTemplate x:DataType="models:CostoReal">
+                            <Border CornerRadius="4" Padding="6,3" HorizontalAlignment="Center"
+                                    Background="{Binding Estado, Converter={x:Static vm:EstadoColorConverter.Instance}}">
+                                <TextBlock Text="{Binding Estado}" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Acciones -->
+                    <DataGridTemplateColumn Header="" Width="75" IsReadOnly="True">
+                        <DataTemplate x:DataType="models:CostoReal">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="2">
+                                <Button Classes="icon-edit" Content="✏️" ToolTip.Tip="Editar"
+                                        Command="{Binding $parent[UserControl].((vm:CostoRealListViewModel)DataContext).EditarCostoCommand}"
+                                        CommandParameter="{Binding}"/>
+                                <Button Classes="icon-delete" Content="🗑️" ToolTip.Tip="Eliminar"
+                                        Command="{Binding $parent[UserControl].((vm:CostoRealListViewModel)DataContext).EliminarCostoCommand}"
+                                        CommandParameter="{Binding}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- FOOTER -->
+            <Border Grid.Row="3" Background="#F9FAFB" Padding="20,11"
+                    BorderBrush="#E5E7EB" BorderThickness="0,1,0,0">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0" Text="{Binding StatusMessage}"
+                               VerticalAlignment="Center" FontSize="13" Foreground="#374151"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                        <Button Classes="secondary" Content="🔄 Refrescar" Command="{Binding RefrescarCommand}"/>
+                        <Button Classes="primary" Content="+ Nuevo Costo Real" Command="{Binding NuevoCostoCommand}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- EDITOR VIEW -->
+        <ContentControl Content="{Binding CurrentEditor}"
+                        IsVisible="{Binding CurrentEditor, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+    </Grid>
+</UserControl>

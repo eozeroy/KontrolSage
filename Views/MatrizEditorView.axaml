@@ -1,0 +1,132 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:KontrolSage.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="KontrolSage.Views.MatrizEditorView"
+             x:DataType="vm:MatrizEditorViewModel">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="20">
+        
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="{Binding Title}" FontSize="24" FontWeight="Bold" Margin="0,0,0,15"/>
+
+        <!-- Formular Top -->
+        <Border Grid.Row="1" Background="White" Padding="15" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,15">
+            <Grid ColumnDefinitions="*,2*,*">
+                <StackPanel Grid.Column="0" Spacing="5" Margin="0,0,10,0">
+                    <TextBlock Text="Código"/>
+                    <TextBox Text="{Binding CodigoInterno}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="5" Margin="10,0,10,0">
+                    <TextBlock Text="Descripción"/>
+                    <TextBox Text="{Binding Descripcion}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Spacing="5" Margin="10,0,0,0">
+                    <TextBlock Text="Unidad"/>
+                    <TextBox Text="{Binding Unidad}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Composition Editor -->
+        <Border Grid.Row="2" Background="White" Padding="0" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="5">
+            <Grid RowDefinitions="Auto,*">
+                
+                <!-- Search Bar Add Insumo -->
+                <Border Grid.Row="0" Padding="15" Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                     <Grid ColumnDefinitions="Auto, *, Auto">
+                         <TextBlock Grid.Column="0" Text="Composición" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,20,0"/>
+
+                         <!-- Inline Add Search -->
+                         <Grid Grid.Column="1" ColumnDefinitions="*, Auto" HorizontalAlignment="Left" Width="400">
+                             <TextBox Grid.Column="0" Text="{Binding SearchText}" Watermark="Buscar código para agregar..." VerticalAlignment="Center"/>
+                             <Button Grid.Column="1" Content="Buscar" Command="{Binding SearchInsumoCommand}" CommandParameter="{Binding SearchText}" Margin="5,0,0,0"/>
+                             <!-- Results Flyout -->
+                         </Grid>                   
+                    </Grid>
+                </Border>
+
+                <!-- Search Results Overlay (Simple MVP Hack) -->
+                <ListBox Grid.Row="1" ItemsSource="{Binding SearchResults}" IsVisible="{Binding SearchResults.Count}" VerticalAlignment="Top" ZIndex="10" Background="White" BorderBrush="#CCC" BorderThickness="1" MaxHeight="150" Margin="15,0,15,0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,2*,Auto">
+                                <TextBlock Grid.Column="0" Text="{Binding ClaveExterna}" Margin="0,0,10,0"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Descripcion}" />
+                                <Button Grid.Column="2" Content="Añadir" Command="{Binding $parent[UserControl].((vm:MatrizEditorViewModel)DataContext).AddInsumoCommand}" CommandParameter="{Binding}" Background="#28A745" Foreground="White" Padding="5,2" FontSize="12"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Compositon Grid -->
+                <Grid Grid.Row="1" RowDefinitions="Auto,*">
+                     <!-- Headers -->
+                     <Border Grid.Row="0" Background="#FDFDFD" Padding="15,10" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                         <Grid ColumnDefinitions="1.5*, 3*, *, *, *, *">
+                             <TextBlock Grid.Column="0" Text="Código" FontWeight="Bold" Foreground="#555"/>
+                             <TextBlock Grid.Column="1" Text="Tipo" FontWeight="Bold" Foreground="#555"/>
+                             <TextBlock Grid.Column="2" Text="Cantidad" FontWeight="Bold" Foreground="#555"/>
+                             <TextBlock Grid.Column="3" Text="Rend." FontWeight="Bold" Foreground="#555"/>
+                             <TextBlock Grid.Column="4" Text="Base" FontWeight="Bold" Foreground="#555" HorizontalAlignment="Right"/>
+                             <TextBlock Grid.Column="5" Text="Importe" FontWeight="Bold" Foreground="#555" HorizontalAlignment="Right"/>
+                         </Grid>
+                     </Border>
+
+                     <!-- Items -->
+                     <ScrollViewer Grid.Row="1">
+                         <ItemsControl ItemsSource="{Binding ComposicionSource}" Margin="0,0,0,10">
+                             <ItemsControl.ItemTemplate>
+                                 <DataTemplate>
+                                     <Border Padding="15,10" BorderBrush="#EEEEEE" BorderThickness="0,0,0,1">
+                                         <Grid ColumnDefinitions="1.5*, 3*, *, *, *, *">
+                                             <TextBlock Grid.Column="0" Text="{Binding CodigoInsumo}" VerticalAlignment="Center"/>
+                                             <TextBlock Grid.Column="1" Text="{Binding Tipo}" VerticalAlignment="Center"/>
+                                             
+                                             <!-- Inputs for changing quantity/performance -->
+                                             <TextBox Grid.Column="2" Text="{Binding Cantidad}" Margin="0,0,10,0" Padding="5,2" />
+                                             <TextBox Grid.Column="3" Text="{Binding Rendimiento}" Margin="0,0,10,0" Padding="5,2" />
+                                             
+                                             <TextBlock Grid.Column="4" Text="{Binding CostoUnitarioSnapshot, StringFormat='c'}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                             
+                                             <StackPanel Grid.Column="5" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                                                <TextBlock Text="{Binding ImporteDirecto, StringFormat='c'}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                                <!-- Need complex binding here to call remove command -->
+                                                <Button Content="X" ToolTip.Tip="Eliminar" Foreground="#D9534F" Background="Transparent" 
+                                                        Command="{Binding $parent[UserControl].((vm:MatrizEditorViewModel)DataContext).RemoveComposicionCommand}"
+                                                        CommandParameter="{Binding}"/>
+                                             </StackPanel>
+                                         </Grid>
+                                     </Border>
+                                 </DataTemplate>
+                             </ItemsControl.ItemTemplate>
+                         </ItemsControl>
+                     </ScrollViewer>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Footer Acciones y Total -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Margin="0,20,0,0">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                 <!-- Boton manual para forzar recalculo en UI tonta -->
+                 <Button Content="Recalcular" Command="{Binding RecalcularTotalCommand}"/>
+                 <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <TextBlock Text="Costo Directo Total:" VerticalAlignment="Center" FontSize="16"/>
+                    <TextBlock Text="{Binding CostoDirectoTotal, StringFormat='c'}" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#007ACC"/>
+                </StackPanel>
+
+                <Button Content="Cancelar" Command="{Binding CancelCommand}" Width="100" HorizontalContentAlignment="Center"/>
+                <Button Content="Guardar Matriz" Command="{Binding SaveCommand}" Background="#007ACC" Foreground="White" Width="130" HorizontalContentAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>
