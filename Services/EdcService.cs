@@ -1,6 +1,7 @@
 using KontrolSage.Models;
 using MongoDB.Driver;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace KontrolSage.Services
@@ -41,7 +42,26 @@ namespace KontrolSage.Services
 
         public async Task DeleteNodeAsync(string nodeId)
         {
-            await _edcNodes.DeleteOneAsync(n => n.Id == nodeId);
+            var nodeToDelete = await _edcNodes.Find(n => n.Id == nodeId).FirstOrDefaultAsync();
+            if (nodeToDelete == null) return;
+
+            string code = nodeToDelete.HierarchyCode;
+            
+            var filterNodes = Builders<EdcNode>.Filter.Regex(n => n.HierarchyCode, new MongoDB.Bson.BsonRegularExpression($"^{code}(\\.|$)"));
+            var nodesToDelete = await _edcNodes.Find(filterNodes).ToListAsync();
+            
+            var idsToDelete = nodesToDelete.Select(n => n.Id).ToList();
+
+            // Desvincular de EDT (Poner AssignedEdcNodeId = null)
+            var client = new MongoClient(DatabaseConfig.ConnectionString);
+            var database = client.GetDatabase(DatabaseConfig.DatabaseName);
+            var edtCollection = database.GetCollection<EdtNode>("EdtNodes");
+
+            var filterUpdate = Builders<EdtNode>.Filter.In(n => n.AssignedEdcNodeId, idsToDelete);
+            var update = Builders<EdtNode>.Update.Set(n => n.AssignedEdcNodeId, null);
+            await edtCollection.UpdateManyAsync(filterUpdate, update);
+
+            await _edcNodes.DeleteManyAsync(filterNodes);
         }
     }
 }

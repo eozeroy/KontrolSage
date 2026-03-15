@@ -6,7 +6,7 @@
              mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="550"
              x:Class="KontrolSage.Views.LoginView"
              x:DataType="vm:LoginViewModel"
-             Background="White">
+            >
 
     <UserControl.Styles>
         <Style Selector="TextBox">
@@ -33,19 +33,17 @@
     <Border Padding="40">
         <StackPanel Spacing="0">
             <!-- Header Section -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0,0,0,10">
+<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0,0,0,10">
                 <!-- Icon Placeholder -->
-                <PathIcon Data="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" 
-                          Height="40" Width="40" Foreground="Black"/> 
-                <TextBlock Text="Kontrol Sage" FontSize="32" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock Text="🏗️ Kontrol Sage" FontSize="32" FontWeight="Bold" VerticalAlignment="Center"/>
             </StackPanel>
             
-            <TextBlock Text="Sistema de Control de Proyectos" FontSize="16" Foreground="#666666" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+            <TextBlock Text="Sistema de Control de Proyectos" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,30"/>
             
             <!-- Welcome Message Box -->
-            <Border Background="#E3F2FD" CornerRadius="8" Padding="15" Margin="0,0,0,25">
+            <Border CornerRadius="8" Padding="15" Margin="0,0,0,25">
                 <TextBlock Text="👋 ¡Bienvenido! Crea tu primera cuenta de administrador" 
-                           Foreground="#1976D2" TextWrapping="Wrap" FontSize="14"/>
+                           TextWrapping="Wrap" FontSize="14"/>
             </Border>
             
             <!-- Form -->
@@ -56,7 +54,7 @@
             <TextBox Text="{Binding Password}" Watermark="Ingresa tu contraseña" PasswordChar="*" Margin="0,0,0,15"/>
             
             <!-- Error Message -->
-            <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" TextWrapping="Wrap" 
+            <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" 
                        IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                        Margin="0,0,0,15"/>
             
@@ -65,15 +63,15 @@
             
             <!-- Register Link -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5">
-                <TextBlock Text="¿No tienes cuenta?" VerticalAlignment="Center" Foreground="#666666"/>
+                <TextBlock Text="¿No tienes cuenta?" VerticalAlignment="Center"/>
                 <Button Content="Regístrate gratis (30 días)" Command="{Binding GoToRegisterCommand}" 
-                        Background="Transparent" Foreground="#1976D2" BorderThickness="0" 
+                        BorderThickness="0" 
                         Padding="0" VerticalAlignment="Center"/>
             </StackPanel>
             
             <!-- Footer -->
             <TextBlock Text="Kontrol Sage v1.0 - Online" HorizontalAlignment="Center" 
-                       Foreground="#999999" FontSize="12" Margin="0,30,0,0"/>
+                       FontSize="12" Margin="0,30,0,0"/>
             
         </StackPanel>
     </Border>

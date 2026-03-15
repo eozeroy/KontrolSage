@@ -27,10 +27,10 @@
         <TextBlock Text="Password"/>
         <TextBox Text="{Binding Password}" Watermark="Choose a password" PasswordChar="*"/>
         
-        <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" TextWrapping="Wrap" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+        <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
         
-        <Button Content="Register" Command="{Binding RegisterCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="#28a745" Foreground="White" FontWeight="Bold"/>
+        <Button Content="Register" Command="{Binding RegisterCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" FontWeight="Bold"/>
         
-        <Button Content="Back to Login" Command="{Binding GoToLoginCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="Transparent" Foreground="#555" BorderThickness="0"/>
+        <Button Content="Back to Login" Command="{Binding GoToLoginCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" BorderThickness="0"/>
     </StackPanel>
 </UserControl>

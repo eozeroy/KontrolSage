@@ -44,7 +44,7 @@
         <!-- Acciones -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,20,0,0">
             <Button Content="Cancelar" Command="{Binding CancelCommand}" Width="100" HorizontalContentAlignment="Center"/>
-            <Button Content="Guardar" Command="{Binding SaveCommand}" Background="#007ACC" Foreground="White" Width="100" HorizontalContentAlignment="Center"/>
+            <Button Content="Guardar" Command="{Binding SaveCommand}" Width="100" HorizontalContentAlignment="Center"/>
         </StackPanel>
 
     </Grid>

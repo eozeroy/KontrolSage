@@ -28,6 +28,9 @@ namespace KontrolSage.ViewModels
         [ObservableProperty]
         private bool _isEditing;
 
+        [ObservableProperty]
+        private bool _isConfirmingDelete;
+
         public string ProjectName => _project.Name;
 
         public EdoViewModel(IEdoService edoService, Project project)
@@ -114,7 +117,16 @@ namespace KontrolSage.ViewModels
         }
 
         [RelayCommand]
-        private async Task DeleteNodeAsync()
+        private void DeleteNode()
+        {
+            if (SelectedNode != null)
+            {
+                IsConfirmingDelete = true;
+            }
+        }
+
+        [RelayCommand]
+        private async Task ConfirmDeleteAsync()
         {
             if (SelectedNode == null || SelectedNode.Id == null) return;
 
@@ -134,6 +146,13 @@ namespace KontrolSage.ViewModels
             }
 
             SelectedNode = null;
+            IsConfirmingDelete = false;
+        }
+
+        [RelayCommand]
+        private void CancelDelete()
+        {
+            IsConfirmingDelete = false;
         }
 
         [RelayCommand]

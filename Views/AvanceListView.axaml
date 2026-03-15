@@ -63,11 +63,11 @@
     <Grid RowDefinitions="Auto,Auto,*,Auto">
 
         <!-- ══ HEADER ════════════════════════════════════════════════════════ -->
-        <Border Grid.Row="0" Background="#007ACC" Padding="20,14">
+        <Border Grid.Row="0" Padding="20,14">
             <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Grid.Column="0" Spacing="2">
-                    <TextBlock Text="📊 Captura de Avance Físico" FontSize="22" FontWeight="Bold" Foreground="White"/>
-                    <TextBlock FontSize="12" Foreground="#BFE3FF">
+                    <TextBlock Text="📊 Captura de Avance Físico" FontSize="22" FontWeight="Bold"/>
+                    <TextBlock FontSize="12">
                         <Run Text="Entrada incremental · Acumulado automático · Eliminable solo hoy · Máximo 100%"/>
                     </TextBlock>
                 </StackPanel>
@@ -75,29 +75,29 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                     <Border Classes="card" Width="160">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Avance Total" FontSize="11" Foreground="#6B7280"/>
+                            <TextBlock Text="Avance Total" FontSize="11"/>
                             <TextBlock Text="{Binding AvanceTotalPonderado, StringFormat='{}{0:P2}'}"
-                                       FontSize="26" FontWeight="Bold" Foreground="#007ACC"/>
+                                       FontSize="26" FontWeight="Bold"/>
                             <ProgressBar Classes="avance" Value="{Binding AvanceTotalPonderado}"/>
                         </StackPanel>
                     </Border>
                     <Border Classes="card" Width="175">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Importe Ejecutado" FontSize="11" Foreground="#6B7280"/>
+                            <TextBlock Text="Importe Ejecutado" FontSize="11"/>
                             <TextBlock Text="{Binding ImporteEjecutadoTotal, StringFormat='{}{0:C2}'}"
-                                       FontSize="15" FontWeight="Bold" Foreground="#22C55E"/>
+                                       FontSize="15" FontWeight="Bold"/>
                             <TextBlock Text="{Binding ImportePresupuestadoTotal, StringFormat='de {0:C2}'}"
-                                       FontSize="11" Foreground="#9CA3AF"/>
+                                       FontSize="11"/>
                         </StackPanel>
                     </Border>
                     <Border Classes="card" Width="120">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Con Avance" FontSize="11" Foreground="#6B7280"/>
+                            <TextBlock Text="Con Avance" FontSize="11"/>
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <TextBlock Text="{Binding ActividadesConAvance}"
-                                           FontSize="26" FontWeight="Bold" Foreground="#007ACC"/>
+                                           FontSize="26" FontWeight="Bold"/>
                                 <TextBlock Text="{Binding Actividades.Count, StringFormat='/ {0}'}"
-                                           FontSize="13" Foreground="#9CA3AF" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
+                                           FontSize="13" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -106,9 +106,9 @@
         </Border>
 
         <!-- ══ FILTROS ════════════════════════════════════════════════════════ -->
-        <Border Grid.Row="1" Background="#F9FAFB" Padding="20,8" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+        <Border Grid.Row="1" Padding="20,8" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
             <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
-                <TextBlock Text="Línea Base:" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="#374151"/>
+                <TextBlock Text="Línea Base:" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 <ComboBox ItemsSource="{Binding AvailableBaselines}"
                           SelectedItem="{Binding SelectedBaseline}"
                           Width="100" VerticalAlignment="Center">
@@ -124,7 +124,7 @@
         </Border>
 
         <!-- ══ BANNER LB0 (visible solo cuando baseline = 0) ════════════════ -->
-        <Border Grid.Row="2" Background="#FEF3C7"
+        <Border Grid.Row="2"
                 BorderBrush="#F59E0B" BorderThickness="0,2,0,2"
                 Padding="20,10"
                 IsVisible="{Binding BaselineValido, Converter={x:Static BoolConverters.Not}}">
@@ -132,9 +132,9 @@
                 <TextBlock Text="&#x26D4;" FontSize="20" VerticalAlignment="Center"/>
                 <StackPanel Spacing="2">
                     <TextBlock Text="Captura de avance deshabilitada para LB0"
-                               FontWeight="Bold" FontSize="13" Foreground="#92400E"/>
+                               FontWeight="Bold" FontSize="13"/>
                     <TextBlock Text="La L&#237;nea Base Original (LB0) es de solo lectura. Seleccione LB1 o superior para registrar avance."
-                               FontSize="12" Foreground="#B45309"/>
+                               FontSize="12"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -146,46 +146,46 @@
                   IsReadOnly="False"
                   GridLinesVisibility="Horizontal"
                   BorderThickness="1" BorderBrush="#E5E7EB"
-                  RowBackground="White"
+                 
                   CanUserReorderColumns="False"
                   CanUserResizeColumns="True">
 
             <!-- RowDetails: Historial de hoy con botón eliminar -->
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate x:DataType="vm:AvanceRowViewModel">
-                    <Border Background="#FFF7ED" Padding="12,8" BorderBrush="#FED7AA" BorderThickness="0,0,0,1">
+                    <Border Padding="12,8" BorderBrush="#FED7AA" BorderThickness="0,0,0,1">
                         <StackPanel Spacing="6">
 
                             <!-- Cabecera historial de hoy -->
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <TextBlock Text="📋 Registros de Hoy (eliminables):"
-                                           FontWeight="SemiBold" FontSize="12" Foreground="#92400E"/>
+                                           FontWeight="SemiBold" FontSize="12"/>
                                 <TextBlock Text="{Binding RegistrosDeHoy.Count, StringFormat='{}{0} registros'}"
-                                           FontSize="11" Foreground="#B45309" VerticalAlignment="Center"/>
+                                           FontSize="11" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <!-- Sin registros hoy -->
                             <TextBlock Text="— Sin registros hoy —"
-                                       FontSize="11" Foreground="#9CA3AF" FontStyle="Italic"
+                                       FontSize="11" FontStyle="Italic"
                                        IsVisible="{Binding RegistrosDeHoy.Count, Converter={x:Static ObjectConverters.IsNull}}"/>
 
                             <!-- Lista de registros de hoy -->
                             <ItemsControl ItemsSource="{Binding RegistrosDeHoy}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="vm:RegistroHoyViewModel">
-                                        <Border Background="White" CornerRadius="4" Padding="10,6"
+                                        <Border CornerRadius="4" Padding="10,6"
                                                 Margin="0,2" BorderBrush="#FDE68A" BorderThickness="1">
                                             <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                                                 <TextBlock Grid.Column="0" Text="{Binding FechaTexto}"
                                                            FontFamily="Consolas,Menlo,monospace"
-                                                           FontSize="12" Foreground="#374151"
+                                                           FontSize="12"
                                                            VerticalAlignment="Center" Width="60"/>
                                                 <TextBlock Grid.Column="1"
                                                            Text="{Binding PorcentajeTexto}"
-                                                           FontWeight="Bold" FontSize="13" Foreground="#059669"
+                                                           FontWeight="Bold" FontSize="13"
                                                            VerticalAlignment="Center" Margin="8,0"/>
                                                 <TextBlock Grid.Column="2" Text="Acumulado al momento"
-                                                           FontSize="11" Foreground="#9CA3AF"
+                                                           FontSize="11"
                                                            VerticalAlignment="Center" Margin="0,0,12,0"/>
                                                 <Button Grid.Column="3" Classes="danger-small"
                                                         Content="🗑 Eliminar"
@@ -219,14 +219,14 @@
                         <StackPanel Margin="8,4" Spacing="3">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <TextBlock Text="{Binding PorcentajeActual, StringFormat='{}{0:P2}'}"
-                                           FontWeight="Bold" FontSize="14" Foreground="#007ACC"/>
+                                           FontWeight="Bold" FontSize="14"/>
                                 <TextBlock Text="{Binding VolumenActual, StringFormat='N2'}"
-                                           FontSize="11" Foreground="#6B7280" VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding Unidad}" FontSize="11" Foreground="#9CA3AF" VerticalAlignment="Center"/>
+                                           FontSize="11" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Unidad}" FontSize="11" VerticalAlignment="Center"/>
                             </StackPanel>
                             <ProgressBar Classes="avance" Value="{Binding PorcentajeActual}"/>
                             <TextBlock Text="{Binding FechaUltimoRegistro, StringFormat='Último: {0:dd/MM/yy HH:mm}'}"
-                                       FontSize="10" Foreground="#9CA3AF"/>
+                                       FontSize="10"/>
                         </StackPanel>
                     </DataTemplate>
                 </DataGridTemplateColumn>
@@ -255,7 +255,7 @@
                                            IsEnabled="{Binding $parent[UserControl].((vm:AvanceListViewModel)DataContext).BaselineValido}"/>
                             <!-- Mensaje de error si excede 100% -->
                             <TextBlock Text="{Binding MensajeValidacion}"
-                                       FontSize="10" Foreground="#DC2626"
+                                       FontSize="10"
                                        TextWrapping="Wrap"
                                        IsVisible="{Binding ExcedeLimite}"/>
                         </StackPanel>
@@ -267,12 +267,12 @@
                     <DataTemplate x:DataType="vm:AvanceRowViewModel">
                         <StackPanel Margin="8,4" Spacing="3" IsVisible="{Binding TieneCambio}">
                             <TextBlock Text="{Binding NuevoAcumulado, StringFormat='{}{0:P2}'}"
-                                       FontWeight="Bold" FontSize="13" Foreground="#16A34A"/>
+                                       FontWeight="Bold" FontSize="13"/>
                             <ProgressBar Classes="avance-nuevo" Value="{Binding NuevoAcumulado}"/>
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <TextBlock Text="{Binding NuevoVolumenEjecutado, StringFormat='N2'}"
-                                           FontSize="11" Foreground="#374151"/>
-                                <TextBlock Text="{Binding Unidad}" FontSize="11" Foreground="#9CA3AF"/>
+                                           FontSize="11"/>
+                                <TextBlock Text="{Binding Unidad}" FontSize="11"/>
                             </StackPanel>
                         </StackPanel>
                     </DataTemplate>
@@ -283,7 +283,7 @@
                     <DataTemplate x:DataType="vm:AvanceRowViewModel">
                         <TextBlock Text="{Binding NuevoImporteEjecutado, StringFormat='C2'}"
                                    Margin="8,0" VerticalAlignment="Center"
-                                   Foreground="#059669" FontWeight="SemiBold"
+                                   FontWeight="SemiBold"
                                    IsVisible="{Binding TieneCambio}"/>
                     </DataTemplate>
                 </DataGridTemplateColumn>
@@ -291,7 +291,7 @@
                 <!-- Indicador de cambio pendiente + expandir historial -->
                 <DataGridTemplateColumn Header="" Width="35" IsReadOnly="True">
                     <DataTemplate x:DataType="vm:AvanceRowViewModel">
-                        <TextBlock Text="●" Foreground="#F59E0B"
+                        <TextBlock Text="●"
                                    IsVisible="{Binding TieneCambio}"
                                    ToolTip.Tip="Cambio pendiente de guardar"
                                    HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"/>
@@ -302,13 +302,13 @@
         </DataGrid>
 
         <!-- ══ FOOTER ════════════════════════════════════════════════════════ -->
-        <Border Grid.Row="3" Background="#F9FAFB" Padding="20,11"
+        <Border Grid.Row="3" Padding="20,11"
                 BorderBrush="#E5E7EB" BorderThickness="0,1,0,0">
             <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Grid.Column="0" Spacing="2">
-                    <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" FontSize="13" Foreground="#374151"/>
+                    <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" FontSize="13"/>
                     <TextBlock Text="💡 Haz clic en una fila para ver/eliminar los registros del día actual."
-                               FontSize="11" Foreground="#9CA3AF"/>
+                               FontSize="11"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
                     <Button Classes="secondary" Content="🔄 Refrescar" Command="{Binding RefrescarCommand}"/>

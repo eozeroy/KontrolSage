@@ -26,7 +26,7 @@
     <UserControl.DataTemplates>
         <DataTemplate DataType="{x:Type vm:HomeViewModel}">
              <Grid>
-                 <TextBlock Text="{Binding Welcome}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="#555"/>
+                 <TextBlock Text="{Binding Welcome}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
              </Grid>
         </DataTemplate>
         <!-- Other DataTemplates are handled by ViewLocator if Views exist -->
@@ -37,14 +37,14 @@
         <Grid RowDefinitions="Auto,*,Auto">
             
             <!-- Top Bar -->
-            <Border Grid.Row="0" Background="#007ACC" Height="50" Padding="15,0">
+            <Border Grid.Row="0" Height="50" Padding="15,0">
                 <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Button Grid.Column="0" Command="{Binding TogglePaneCommand}" Background="Transparent" BorderThickness="0" VerticalAlignment="Center">
-                        <PathIcon Data="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" Foreground="White"/>
+                    <Button Grid.Column="0" Command="{Binding TogglePaneCommand}" BorderThickness="0" VerticalAlignment="Center">
+                        <PathIcon Data="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
                     </Button>
                     
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0,0,0" Spacing="20">
-                        <TextBlock Text="Kontrol Sage Dashboard" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+                        <TextBlock Text="Kontrol Sage Dashboard" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
                         
                         <ComboBox ItemsSource="{Binding Projects}" 
                                   SelectedItem="{Binding SelectedProject}"
@@ -52,16 +52,16 @@
                                   Width="200"
                                   VerticalAlignment="Center"
                                   PlaceholderText="Selecciona un Proyecto..."
-                                  Background="White" Foreground="Black">
+                                 >
                         </ComboBox>
                     </StackPanel>
                     
                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                         <Button Background="Transparent" BorderThickness="0">
+                         <Button BorderThickness="0">
                              <StackPanel Orientation="Horizontal" Spacing="8">
-                                 <TextBlock Text="{Binding User.Username}" Foreground="White" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                 <TextBlock Text="{Binding User.Username}" VerticalAlignment="Center" FontWeight="SemiBold"/>
                                  <PathIcon Data="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" 
-                                           Foreground="White" VerticalAlignment="Center"/>
+                                           VerticalAlignment="Center"/>
                              </StackPanel>
                              <Button.Flyout>
                                  <MenuFlyout>
@@ -85,7 +85,6 @@
                 <SplitView.Pane>
                     <StackPanel Spacing="5" Margin="0,10">
                         <Button Classes="menuItem" Content="🏠 Dashboard" Command="{Binding ShowHomeCommand}"/>
-                        <Button Classes="menuItem" Content="📊 Dashboard EVM" Command="{Binding ShowDashboardKpiCommand}"/>
                         <Button Classes="menuItem" Content="📁 Proyectos" Command="{Binding ShowProjectListCommand}"/>
                         <Button Classes="menuItem" Content="👥 Organigrama (EDO)" Command="{Binding ShowEdoCommand}"/>
                         <Button Classes="menuItem" Content="💰 Cuentas (EDC)" Command="{Binding ShowEdcCommand}"/>
@@ -104,12 +103,12 @@
             </SplitView>
 
             <!-- Status Bar -->
-            <Border Grid.Row="2" Background="#EEEEEE" Height="30" BorderBrush="#CCCCCC" BorderThickness="0,1,0,0" Padding="10,0">
+            <Border Grid.Row="2" Height="30" BorderBrush="#CCCCCC" BorderThickness="0,1,0,0" Padding="10,0">
                 <Grid ColumnDefinitions="*,Auto">
-                     <TextBlock Grid.Column="0" Text="Listo" VerticalAlignment="Center" Foreground="#666666" FontSize="12"/>
+                     <TextBlock Grid.Column="0" Text="Listo" VerticalAlignment="Center" FontSize="12"/>
                      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="15">
-                         <TextBlock Text="{Binding ConnectionStatus}" VerticalAlignment="Center" Foreground="#666666" FontSize="12"/>
-                         <TextBlock Text="{Binding AppVersion}" VerticalAlignment="Center" Foreground="#666666" FontSize="12"/>
+                         <TextBlock Text="{Binding ConnectionStatus}" VerticalAlignment="Center" FontSize="12"/>
+                         <TextBlock Text="{Binding AppVersion}" VerticalAlignment="Center" FontSize="12"/>
                      </StackPanel>
                 </Grid>
             </Border>

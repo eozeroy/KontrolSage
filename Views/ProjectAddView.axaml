@@ -29,11 +29,11 @@
                 </StackPanel>
             </Grid>
             
-            <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
             
             <StackPanel Orientation="Horizontal" Spacing="20" Margin="0,20,0,0" HorizontalAlignment="Right">
-                <Button Content="Cancelar" Command="{Binding CancelCommand}" Background="Transparent" Foreground="Gray"/>
-                <Button Content="Guardar" Command="{Binding SaveCommand}" Background="#007ACC" Foreground="White"/>
+                <Button Content="Cancelar" Command="{Binding CancelCommand}"/>
+                <Button Content="Guardar" Command="{Binding SaveCommand}"/>
             </StackPanel>
         </StackPanel>
     </Border>

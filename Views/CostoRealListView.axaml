@@ -50,40 +50,40 @@
               RowDefinitions="Auto,Auto,*,Auto">
 
             <!-- HEADER -->
-            <Border Grid.Row="0" Background="#007ACC" Padding="20,14">
+            <Border Grid.Row="0" Padding="20,14">
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Grid.Column="0" Spacing="2">
-                        <TextBlock Text="💵 Costo Real (AC)" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="💵 Costo Real (AC)" FontSize="22" FontWeight="Bold"/>
                         <TextBlock Text="Gastos reales incurridos por cuenta EDC · CRUD completo"
-                                   FontSize="12" Foreground="#BFE3FF"/>
+                                   FontSize="12"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                         <Border Classes="card" Width="155">
                             <StackPanel Spacing="2">
-                                <TextBlock Text="Total (sin IVA)" FontSize="11" Foreground="#6B7280"/>
+                                <TextBlock Text="Total (sin IVA)" FontSize="11"/>
                                 <TextBlock Text="{Binding TotalImporte, StringFormat='{}{0:C2}'}"
-                                           FontSize="18" FontWeight="Bold" Foreground="#007ACC"/>
+                                           FontSize="18" FontWeight="Bold"/>
                             </StackPanel>
                         </Border>
                         <Border Classes="card" Width="130">
                             <StackPanel Spacing="2">
-                                <TextBlock Text="IVA" FontSize="11" Foreground="#6B7280"/>
+                                <TextBlock Text="IVA" FontSize="11"/>
                                 <TextBlock Text="{Binding TotalIVA, StringFormat='{}{0:C2}'}"
-                                           FontSize="18" FontWeight="Bold" Foreground="#6B7280"/>
+                                           FontSize="18" FontWeight="Bold"/>
                             </StackPanel>
                         </Border>
                         <Border Classes="card" Width="155">
                             <StackPanel Spacing="2">
-                                <TextBlock Text="Total con IVA" FontSize="11" Foreground="#6B7280"/>
+                                <TextBlock Text="Total con IVA" FontSize="11"/>
                                 <TextBlock Text="{Binding TotalConIVA, StringFormat='{}{0:C2}'}"
-                                           FontSize="18" FontWeight="Bold" Foreground="#059669"/>
+                                           FontSize="18" FontWeight="Bold"/>
                             </StackPanel>
                         </Border>
                         <Border Classes="card" Width="90">
                             <StackPanel Spacing="2">
-                                <TextBlock Text="Registros" FontSize="11" Foreground="#6B7280"/>
+                                <TextBlock Text="Registros" FontSize="11"/>
                                 <TextBlock Text="{Binding TotalRegistros}"
-                                           FontSize="22" FontWeight="Bold" Foreground="#374151"/>
+                                           FontSize="22" FontWeight="Bold"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -91,21 +91,21 @@
             </Border>
 
             <!-- FILTROS -->
-            <Border Grid.Row="1" Background="#F9FAFB" Padding="20,10" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <Border Grid.Row="1" Padding="20,10" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
                 <WrapPanel Orientation="Horizontal" ItemWidth="200">
                     <!-- Fecha Desde -->
                     <StackPanel Margin="0,0,16,4" Spacing="3">
-                        <TextBlock Text="Desde" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280"/>
+                        <TextBlock Text="Desde" FontSize="11" FontWeight="SemiBold"/>
                         <CalendarDatePicker SelectedDate="{Binding FechaDesde}" Width="140"/>
                     </StackPanel>
                     <!-- Fecha Hasta -->
                     <StackPanel Margin="0,0,16,4" Spacing="3">
-                        <TextBlock Text="Hasta" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280"/>
+                        <TextBlock Text="Hasta" FontSize="11" FontWeight="SemiBold"/>
                         <CalendarDatePicker SelectedDate="{Binding FechaHasta}" Width="140"/>
                     </StackPanel>
                     <!-- Cuenta EDC -->
                     <StackPanel Margin="0,0,16,4" Width="220" Spacing="3">
-                        <TextBlock Text="Cuenta EDC" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280"/>
+                        <TextBlock Text="Cuenta EDC" FontSize="11" FontWeight="SemiBold"/>
                         <ComboBox ItemsSource="{Binding EdcHojas}"
                                   SelectedItem="{Binding FiltroEdcNode}"
                                   Width="220" PlaceholderText="— Todas —">
@@ -118,14 +118,14 @@
                     </StackPanel>
                     <!-- Tipo Recurso -->
                     <StackPanel Margin="0,0,16,4" Width="140" Spacing="3">
-                        <TextBlock Text="Tipo Recurso" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280"/>
+                        <TextBlock Text="Tipo Recurso" FontSize="11" FontWeight="SemiBold"/>
                         <ComboBox ItemsSource="{Binding TiposRecursoFiltro}"
                                   SelectedItem="{Binding FiltroTipoRecurso}"
                                   Width="140" PlaceholderText="— Todos —"/>
                     </StackPanel>
                     <!-- Estado -->
                     <StackPanel Margin="0,0,16,4" Width="140" Spacing="3">
-                        <TextBlock Text="Estado" FontSize="11" FontWeight="SemiBold" Foreground="#6B7280"/>
+                        <TextBlock Text="Estado" FontSize="11" FontWeight="SemiBold"/>
                         <ComboBox ItemsSource="{Binding EstadosFiltro}"
                                   SelectedItem="{Binding FiltroEstado}"
                                   Width="140" PlaceholderText="— Todos —"/>
@@ -142,7 +142,7 @@
                       IsReadOnly="True"
                       GridLinesVisibility="Horizontal"
                       BorderThickness="1" BorderBrush="#E5E7EB"
-                      RowBackground="White"
+                     
                       CanUserResizeColumns="True">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat='dd/MM/yyyy'}" Width="95"/>
@@ -160,8 +160,8 @@
                     <DataGridTemplateColumn Header="Estado" Width="110" IsReadOnly="True">
                         <DataTemplate x:DataType="models:CostoReal">
                             <Border CornerRadius="4" Padding="6,3" HorizontalAlignment="Center"
-                                    Background="{Binding Estado, Converter={x:Static vm:EstadoColorConverter.Instance}}">
-                                <TextBlock Text="{Binding Estado}" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                                   >
+                                <TextBlock Text="{Binding Estado}" FontSize="11" FontWeight="SemiBold"/>
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn>
@@ -183,11 +183,11 @@
             </DataGrid>
 
             <!-- FOOTER -->
-            <Border Grid.Row="3" Background="#F9FAFB" Padding="20,11"
+            <Border Grid.Row="3" Padding="20,11"
                     BorderBrush="#E5E7EB" BorderThickness="0,1,0,0">
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBlock Grid.Column="0" Text="{Binding StatusMessage}"
-                               VerticalAlignment="Center" FontSize="13" Foreground="#374151"/>
+                               VerticalAlignment="Center" FontSize="13"/>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
                         <Button Classes="secondary" Content="🔄 Refrescar" Command="{Binding RefrescarCommand}"/>
                         <Button Classes="primary" Content="+ Nuevo Costo Real" Command="{Binding NuevoCostoCommand}"/>

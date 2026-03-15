@@ -19,6 +19,8 @@ namespace KontrolSage.Models
         
         public string HierarchyCode { get; set; } = string.Empty; // e.g., "1", "1.1", "1.1.1"
 
+        public int? Ie { get; set; } // Identificador exclusivo de MS Project (solo referencia)
+
         [BsonRepresentation(BsonType.ObjectId)]
         public string? AssignedEdcNodeId { get; set; } // Links to an EdcNode (must be a leaf)
 
@@ -28,5 +30,15 @@ namespace KontrolSage.Models
 
         [BsonIgnore]
         public EdcNode? AssignedEdcNode { get; set; }
+
+        // Transient properties used during import
+        [BsonIgnore]
+        public System.DateTime? ImportInicio { get; set; }
+
+        [BsonIgnore]
+        public System.DateTime? ImportFin { get; set; }
+
+        [BsonIgnore]
+        public string ImportNotas { get; set; } = string.Empty;
     }
 }

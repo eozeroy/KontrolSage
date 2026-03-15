@@ -11,11 +11,11 @@
         <!-- MAIN LIST VIEW -->
         <Grid IsVisible="{Binding CurrentEditor, Converter={x:Static ObjectConverters.IsNull}}" RowDefinitions="Auto, *">
             <!-- Header & Filters -->
-            <Border Grid.Row="0" Background="#f2f8fc" Padding="20" BorderBrush="#007ACC" BorderThickness="0,0,0,2">
+            <Border Grid.Row="0" Padding="20" BorderBrush="#007ACC" BorderThickness="0,0,0,2">
                 <Grid ColumnDefinitions="*, Auto">
                     <StackPanel Grid.Column="0" Spacing="5">
-                        <TextBlock Text="Análisis del Costo Directo" FontSize="24" FontWeight="Bold" Foreground="#007ACC"/>
-                        <TextBlock Text="Presupuesto base e histórico por nodos de la Estructura de Trabajo" FontSize="14" Foreground="#555"/>
+                        <TextBlock Text="Análisis del Costo Directo" FontSize="24" FontWeight="Bold"/>
+                        <TextBlock Text="Presupuesto base e histórico por nodos de la Estructura de Trabajo" FontSize="14"/>
                     </StackPanel>
                     
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="15" VerticalAlignment="Center">
@@ -31,7 +31,7 @@
                         <Button Content="Fijar Línea Base Original" 
                                 Command="{Binding CongelarBaselineOriginalAsync}" 
                                 IsVisible="{Binding CanFreezeBaseline}"
-                                Background="#D9534F" Foreground="White" FontWeight="Bold" ToolTip.Tip="Congela LB0 y crea LB1"/>
+                                FontWeight="Bold" ToolTip.Tip="Congela LB0 y crea LB1"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -47,7 +47,7 @@
                           IsReadOnly="True"
                           GridLinesVisibility="All"
                           BorderThickness="1" BorderBrush="#E0E0E0"
-                          RowBackground="White">
+                         >
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Línea Base" Binding="{Binding Baseline, StringFormat='LB {0}'}" Width="100"/>
                         <DataGridTextColumn Header="N. EDT" Binding="{Binding EdtNodeId}" Width="150" />
@@ -62,10 +62,10 @@
                                 <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
                                     <Button Content="📝" ToolTip.Tip="Analizar Costo / Editar" 
                                             Command="{Binding $parent[UserControl].((vm:DirectCostListViewModel)DataContext).EditActivityCommand}" 
-                                            CommandParameter="{Binding}" Background="Transparent" Padding="5"/>
+                                            CommandParameter="{Binding}" Padding="5"/>
                                     <Button Content="🗑️" ToolTip.Tip="Eliminar" 
                                             Command="{Binding $parent[UserControl].((vm:DirectCostListViewModel)DataContext).EliminarActividadCommand}" 
-                                            CommandParameter="{Binding}" Background="Transparent" Padding="5"
+                                            CommandParameter="{Binding}" Padding="5"
                                             IsVisible="{Binding !IsFrozen}"/>
                                 </StackPanel>
                             </DataTemplate>
@@ -74,11 +74,11 @@
                 </DataGrid>
 
                 <!-- Footer Summary -->
-                <Border Grid.Row="1" Background="#FDFDFD" Padding="15,10" BorderBrush="#E0E0E0" BorderThickness="1,0,1,1">
+                <Border Grid.Row="1" Padding="15,10" BorderBrush="#E0E0E0" BorderThickness="1,0,1,1">
                     <StackPanel Orientation="Horizontal" Spacing="20">
-                        <TextBlock Text="{Binding TotalActivities, StringFormat='Actividades: {0}'}" FontWeight="SemiBold" Foreground="#555" VerticalAlignment="Center"/>
-                        <TextBlock Text="|" Foreground="#CCC" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding TotalAmount, StringFormat='Importe Total: {0:C}'}" FontWeight="Bold" FontSize="16" Foreground="#007ACC" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding TotalActivities, StringFormat='Actividades: {0}'}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Text="|" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding TotalAmount, StringFormat='Importe Total: {0:C}'}" FontWeight="Bold" FontSize="16" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Border>
             </Grid>

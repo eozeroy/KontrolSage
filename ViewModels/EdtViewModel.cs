@@ -11,7 +11,9 @@ namespace KontrolSage.ViewModels
     public partial class EdtViewModel : ViewModelBase
     {
         private readonly IEdtService _edtService;
+        private readonly IEdtImportService _importService;
         private readonly IEdcService _edcService;
+        private readonly IDirectCostService _directCostService;
         private readonly Project _project;
 
         [ObservableProperty]
@@ -33,15 +35,23 @@ namespace KontrolSage.ViewModels
         [ObservableProperty]
         private bool _isEditing;
 
+        [ObservableProperty]
+        private bool _isBusy;
+
+        [ObservableProperty]
+        private bool _isConfirmingDelete;
+
         public string ProjectName => _project.Name;
 
         // An EDT node can only be assigned an account if it has NO children itself.
         public bool CanAssignAccount => SelectedNode != null && SelectedNode.Children.Count == 0;
 
-        public EdtViewModel(IEdtService edtService, IEdcService edcService, Project project)
+        public EdtViewModel(IEdtService edtService, IEdtImportService importService, IEdcService edcService, IDirectCostService directCostService, Project project)
         {
             _edtService = edtService;
+            _importService = importService;
             _edcService = edcService;
+            _directCostService = directCostService;
             _project = project;
 
             _ = InitializeAsync();
@@ -180,7 +190,16 @@ namespace KontrolSage.ViewModels
         }
 
         [RelayCommand]
-        private async Task DeleteNodeAsync()
+        private void DeleteNode()
+        {
+            if (SelectedNode != null)
+            {
+                IsConfirmingDelete = true;
+            }
+        }
+
+        [RelayCommand]
+        private async Task ConfirmDeleteAsync()
         {
             if (SelectedNode == null || SelectedNode.Id == null) return;
 
@@ -200,6 +219,13 @@ namespace KontrolSage.ViewModels
             }
 
             SelectedNode = null;
+            IsConfirmingDelete = false;
+        }
+
+        [RelayCommand]
+        private void CancelDelete()
+        {
+            IsConfirmingDelete = false;
         }
 
         [RelayCommand]
@@ -233,6 +259,54 @@ namespace KontrolSage.ViewModels
         private void CancelEdit()
         {
             ClearForm();
+        }
+
+        public async Task ImportProjectAsync(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath) || _project.Id == null) return;
+            
+            IsBusy = true;
+            try
+            {
+                var importedNodes = await _importService.ParseImportFileAsync(filePath, _project.Id);
+                if (importedNodes.Count > 0)
+                {
+                    // Detect leaf nodes natively since 'Children' list should tell us if it's a leaf post parsing.
+                    foreach (var node in importedNodes)
+                    {
+                        // Create node in database
+                        await _edtService.CreateNodeAsync(node);
+
+                        // If it's a leaf node we auto-generate base activity
+                        if (node.Children == null || node.Children.Count == 0)
+                        {
+                            var newAct = new ActividadPresupuesto
+                            {
+                                ProjectId = _project.Id ?? string.Empty,
+                                EdtNodeId = node.Id ?? string.Empty,
+                                Baseline = 0,
+                                IsFrozen = false,
+                                Inicio = node.ImportInicio ?? System.DateTime.Today,
+                                Fin = node.ImportFin ?? System.DateTime.Today,
+                                Notas = node.ImportNotas ?? string.Empty
+                            };
+                            
+                            await _directCostService.GuardarActividadAsync(newAct);
+                        }
+                    }
+                    
+                    // Reload tree
+                    await LoadNodesAsync();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error importando: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void ClearForm()

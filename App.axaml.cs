@@ -32,6 +32,7 @@ public partial class App : Application
         services.AddSingleton<IEdoService, EdoService>();
         services.AddSingleton<IEdcService, EdcService>();
         services.AddSingleton<IEdtService, EdtService>();
+        services.AddSingleton<IEdtImportService, EdtImportService>();
         services.AddSingleton<IPriceCatalogService, MongoPriceCatalogService>();
         services.AddSingleton<IDirectCostService, MongoDirectCostService>();
         services.AddSingleton<IAvanceService, MongoAvanceService>();
@@ -73,13 +74,14 @@ public partial class App : Application
         var edoService = _serviceProvider.GetRequiredService<IEdoService>();
         var edcService = _serviceProvider.GetRequiredService<IEdcService>();
         var edtService = _serviceProvider.GetRequiredService<IEdtService>();
+        var edtImportService = _serviceProvider.GetRequiredService<IEdtImportService>();
         var catalogService = _serviceProvider.GetRequiredService<IPriceCatalogService>();
         var directCostService = _serviceProvider.GetRequiredService<IDirectCostService>();
         var avanceService = _serviceProvider.GetRequiredService<IAvanceService>();
         var costoRealService = _serviceProvider.GetRequiredService<ICostoRealService>();
         var evmService = _serviceProvider.GetRequiredService<IEvmService>();
         
-        var dashboardVm = new DashboardViewModel(user, projectService, edoService, edcService, edtService, catalogService, directCostService, avanceService, costoRealService, evmService);
+        var dashboardVm = new DashboardViewModel(user, projectService, edoService, edcService, edtService, edtImportService, catalogService, directCostService, avanceService, costoRealService, evmService);
         
         var mainViewModel = new MainWindowViewModel(null!);
         mainViewModel.CurrentView = dashboardVm;

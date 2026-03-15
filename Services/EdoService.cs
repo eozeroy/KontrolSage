@@ -1,6 +1,7 @@
 using KontrolSage.Models;
 using MongoDB.Driver;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace KontrolSage.Services
@@ -41,8 +42,28 @@ namespace KontrolSage.Services
 
         public async Task DeleteNodeAsync(string nodeId)
         {
-             // We could optionally recursively delete children by looking for ParentId == nodeId
-            await _edoNodes.DeleteOneAsync(n => n.Id == nodeId);
+            var nodeToDelete = await _edoNodes.Find(n => n.Id == nodeId).FirstOrDefaultAsync();
+            if (nodeToDelete == null) return;
+
+            string code = nodeToDelete.HierarchyCode;
+            
+            // Find all children and self using regex "^code\..*" or exact match
+            var filterNodes = Builders<EdoNode>.Filter.Regex(n => n.HierarchyCode, new MongoDB.Bson.BsonRegularExpression($"^{code}(\\.|$)"));
+            var nodesToDelete = await _edoNodes.Find(filterNodes).ToListAsync();
+            
+            var idsToDelete = nodesToDelete.Select(n => n.Id).ToList();
+
+            // Desvincular de EDC (Poner ResponsibleEdoNodeId = null)
+            var client = new MongoClient(DatabaseConfig.ConnectionString);
+            var database = client.GetDatabase(DatabaseConfig.DatabaseName);
+            var edcCollection = database.GetCollection<EdcNode>("EdcNodes");
+
+            var filterUpdate = Builders<EdcNode>.Filter.In(n => n.ResponsibleEdoNodeId, idsToDelete);
+            var update = Builders<EdcNode>.Update.Set(n => n.ResponsibleEdoNodeId, null);
+            await edcCollection.UpdateManyAsync(filterUpdate, update);
+
+            // Eliminar los nodos EDO
+            await _edoNodes.DeleteManyAsync(filterNodes);
         }
     }
 }

@@ -26,7 +26,10 @@
     </PackageReference>
     <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+    <PackageReference Include="ExcelDataReader" Version="3.8.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.8.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
     <PackageReference Include="MongoDB.Driver" Version="3.6.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.3" />
   </ItemGroup>
 </Project>

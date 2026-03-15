@@ -33,6 +33,9 @@ namespace KontrolSage.ViewModels
         [ObservableProperty]
         private bool _isEditing;
 
+        [ObservableProperty]
+        private bool _isConfirmingDelete;
+
         public string ProjectName => _project.Name;
 
         // An EDC node can only be assigned a responsible if it has NO children itself.
@@ -180,7 +183,16 @@ namespace KontrolSage.ViewModels
         }
 
         [RelayCommand]
-        private async Task DeleteNodeAsync()
+        private void DeleteNode()
+        {
+            if (SelectedNode != null)
+            {
+                IsConfirmingDelete = true;
+            }
+        }
+
+        [RelayCommand]
+        private async Task ConfirmDeleteAsync()
         {
             if (SelectedNode == null || SelectedNode.Id == null) return;
 
@@ -203,6 +215,13 @@ namespace KontrolSage.ViewModels
             }
 
             SelectedNode = null;
+            IsConfirmingDelete = false;
+        }
+
+        [RelayCommand]
+        private void CancelDelete()
+        {
+            IsConfirmingDelete = false;
         }
 
         [RelayCommand]

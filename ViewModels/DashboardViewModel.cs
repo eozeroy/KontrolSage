@@ -39,6 +39,7 @@ namespace KontrolSage.ViewModels
         private readonly IEdoService _edoService;
         private readonly IEdcService _edcService;
         private readonly IEdtService _edtService;
+        private readonly IEdtImportService _edtImportService;
         private readonly IPriceCatalogService _catalogService;
         private readonly IDirectCostService _directCostService;
         private readonly IAvanceService _avanceService;
@@ -52,12 +53,13 @@ namespace KontrolSage.ViewModels
         }
 
         // Constructor with Dependency Injection
-        public DashboardViewModel(User user, IProjectService projectService, IEdoService edoService, IEdcService edcService, IEdtService edtService, IPriceCatalogService catalogService, IDirectCostService directCostService, IAvanceService avanceService, ICostoRealService costoRealService, IEvmService evmService) : this(user)
+        public DashboardViewModel(User user, IProjectService projectService, IEdoService edoService, IEdcService edcService, IEdtService edtService, IEdtImportService edtImportService, IPriceCatalogService catalogService, IDirectCostService directCostService, IAvanceService avanceService, ICostoRealService costoRealService, IEvmService evmService) : this(user)
         {
             _projectService = projectService;
             _edoService = edoService;
             _edcService = edcService;
             _edtService = edtService;
+            _edtImportService = edtImportService;
             _catalogService = catalogService;
             _directCostService = directCostService;
             _avanceService = avanceService;
@@ -161,9 +163,9 @@ namespace KontrolSage.ViewModels
         [RelayCommand]
         public void ShowEdt()
         {
-            if (_edtService != null && _edcService != null && SelectedProject != null)
+            if (_edtService != null && _edtImportService != null && _edcService != null && SelectedProject != null && _directCostService != null)
             {
-                CurrentContent = new EdtViewModel(_edtService, _edcService, SelectedProject);
+                CurrentContent = new EdtViewModel(_edtService, _edtImportService, _edcService, _directCostService, SelectedProject);
             }
             else if (SelectedProject == null)
             {
@@ -216,19 +218,6 @@ namespace KontrolSage.ViewModels
             else if (SelectedProject == null)
             {
                 ShowHome();
-            }
-        }
-
-        [RelayCommand]
-        public void ShowDashboardKpi()
-        {
-            if (_evmService != null && _directCostService != null && SelectedProject != null)
-            {
-                CurrentContent = new DashboardKpiViewModel(_evmService, _directCostService, SelectedProject);
-            }
-            else if (SelectedProject == null)
-            {
-                CurrentContent = new HomeViewModel(User);
             }
         }
 
