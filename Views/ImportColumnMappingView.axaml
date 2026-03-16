@@ -1,0 +1,131 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:KontrolSage.ViewModels"
+        x:Class="KontrolSage.Views.ImportColumnMappingView"
+        x:DataType="vm:ImportColumnMappingViewModel"
+        Title="{Binding Titulo}"
+        Width="780" Height="620"
+        MinWidth="680" MinHeight="500"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True"
+        ShowInTaskbar="False">
+
+    <Grid RowDefinitions="Auto, Auto, *, Auto" Margin="24">
+
+        <!-- ── HEADER ──────────────────────────────────────────────────────── -->
+        <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,16">
+            <TextBlock Text="{Binding Titulo}" FontSize="20" FontWeight="Bold"/>
+            <TextBlock FontSize="13" Opacity="0.6">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="Archivo con {0} columnas y {1} filas de datos detectadas">
+                        <Binding Path="ExcelHeaders.Count"/>
+                        <Binding Path="TotalRows"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </StackPanel>
+
+        <!-- ── PREVIEW ─────────────────────────────────────────────────────── -->
+        <Border Grid.Row="1" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="6"
+                Margin="0,0,0,16" Padding="0" MaxHeight="120">
+            <Grid RowDefinitions="Auto,*">
+                <Border Grid.Row="0" Background="#F5F5F5" Padding="10,6" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                    <TextBlock Text="Vista previa (primeras 3 filas)" FontSize="12" FontWeight="SemiBold" Opacity="0.7"/>
+                </Border>
+                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <DataGrid x:Name="PreviewDataGrid"
+                              ItemsSource="{Binding PreviewRows}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserReorderColumns="False"
+                              CanUserResizeColumns="True"
+                              BorderThickness="0"
+                              GridLinesVisibility="All">
+                        <DataGrid.Columns>
+                            <!-- Columns generated in code-behind from ExcelHeaders -->
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- ── MAPPING TABLE ───────────────────────────────────────────────── -->
+        <Border Grid.Row="2" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="6" Padding="0">
+            <Grid RowDefinitions="Auto,*">
+
+                <!-- Table header -->
+                <Border Grid.Row="0" Background="#F5F5F5" Padding="14,8"
+                        BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                    <Grid ColumnDefinitions="*,16,2*">
+                        <TextBlock Grid.Column="0" Text="Campo del modelo"
+                                   FontSize="12" FontWeight="SemiBold" Opacity="0.7"/>
+                        <TextBlock Grid.Column="2" Text="Columna en el Excel"
+                                   FontSize="12" FontWeight="SemiBold" Opacity="0.7"/>
+                    </Grid>
+                </Border>
+
+                <!-- Rows -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Mappings}" Margin="0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ColumnMappingEntry">
+                                <Border Padding="14,10" BorderBrush="#EEEEEE" BorderThickness="0,0,0,1">
+                                    <Grid ColumnDefinitions="*,16,2*">
+
+                                        <!-- Campo del modelo -->
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding DisplayName}"
+                                                       FontSize="14" VerticalAlignment="Center"/>
+                                            <Border IsVisible="{Binding IsRequired}"
+                                                    Background="#FFEBEE" CornerRadius="3" Padding="4,1">
+                                                <TextBlock Text="requerido" FontSize="10"
+                                                           Foreground="#C62828" FontWeight="SemiBold"/>
+                                            </Border>
+                                        </StackPanel>
+
+                                        <!-- Arrow indicator -->
+                                        <TextBlock Grid.Column="1" Text="→"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   Opacity="0.4" FontSize="16"/>
+
+                                        <!-- ComboBox col Excel -->
+                                        <ComboBox Grid.Column="2"
+                                                  HorizontalAlignment="Stretch"
+                                                  SelectedItem="{Binding SelectedHeader}"
+                                                  ItemsSource="{Binding $parent[ItemsControl].((vm:ImportColumnMappingViewModel)DataContext).ExcelHeadersConIgnorar}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- ── FOOTER ──────────────────────────────────────────────────────── -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto,Auto" Margin="0,16,0,0">
+
+            <!-- Validation message (emoji ✅/❌ in text already shows state) -->
+            <TextBlock Grid.Column="0"
+                       Text="{Binding MensajeValidacion}"
+                       VerticalAlignment="Center"
+                       FontSize="13"
+                       TextWrapping="Wrap"
+                       Opacity="0.85"/>
+
+            <Button Grid.Column="1"
+                    Content="Cancelar"
+                    Command="{Binding CancelarCommand}"
+                    Margin="0,0,10,0"/>
+
+            <Button Grid.Column="2"
+                    Content="📥 Importar"
+                    Command="{Binding ConfirmarImportCommand}"
+                    FontWeight="SemiBold"
+                    IsDefault="True"/>
+        </Grid>
+
+    </Grid>
+</Window>

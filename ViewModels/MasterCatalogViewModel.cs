@@ -1,22 +1,28 @@
 using Avalonia.Collections;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using KontrolSage.Models;
 using KontrolSage.Services;
+using KontrolSage.Views;
 
 namespace KontrolSage.ViewModels
 {
     public partial class MasterCatalogViewModel : ViewModelBase
     {
         private readonly IPriceCatalogService _repository;
-        
+        private readonly ExcelImportService _excelImportService;
+
         [ObservableProperty]
         private string _searchText = string.Empty;
-        
+
         [ObservableProperty]
         private bool _isBusy;
 
@@ -29,7 +35,8 @@ namespace KontrolSage.ViewModels
         public MasterCatalogViewModel(IPriceCatalogService repository)
         {
             _repository = repository;
-            
+            _excelImportService = new ExcelImportService();
+
             // Initial load
             _ = ExecuteSearchAsync(string.Empty);
         }
@@ -38,15 +45,13 @@ namespace KontrolSage.ViewModels
         public MasterCatalogViewModel()
         {
             _repository = null!; // Dummy for designer
+            _excelImportService = null!;
             // Dummy data for designer
-             MatrizCatalogSource.Add(new MatrizAPU { CodigoInterno = "TRA-001", DescripcionConcepto = "Trazo y nivelación topográfica", UnidadAnalisis = "m2", CostoDirectoTotal = 15.50m });
+            MatrizCatalogSource.Add(new MatrizAPU { CodigoInterno = "TRA-001", DescripcionConcepto = "Trazo y nivelación topográfica", UnidadAnalisis = "m2", CostoDirectoTotal = 15.50m });
         }
 
         partial void OnSearchTextChanged(string value)
         {
-            // A simple debounce/throttle could be implemented here using Rx or a Timer.
-            // For MVP we will just search directly on change, or rely on a "Search" button.
-            // But we will do a basic direct search.
             _ = ExecuteSearchAsync(value);
         }
 
@@ -54,7 +59,7 @@ namespace KontrolSage.ViewModels
         private async Task ExecuteSearchAsync(string query)
         {
             if (_repository == null) return;
-            
+
             IsBusy = true;
             try
             {
@@ -62,18 +67,17 @@ namespace KontrolSage.ViewModels
                 var resultadosDbTask = _repository.BuscarMatricesGlobalesAsync(query);
 
                 await Task.WhenAll(resultadosInsumosTask, resultadosDbTask);
-                
-                var inusmos = await resultadosInsumosTask;
+
+                var insumos = await resultadosInsumosTask;
                 var matrices = await resultadosDbTask;
 
-                // Actualizar colección visual en el Thread Correcto de Avalonia UI
-                Dispatcher.UIThread.Post(() => 
+                Dispatcher.UIThread.Post(() =>
                 {
                     MatrizCatalogSource.Clear();
                     MatrizCatalogSource.AddRange(matrices);
-                    
+
                     InsumoCatalogSource.Clear();
-                    InsumoCatalogSource.AddRange(inusmos);
+                    InsumoCatalogSource.AddRange(insumos);
                 });
             }
             finally
@@ -82,7 +86,7 @@ namespace KontrolSage.ViewModels
             }
         }
 
-        // --- Commands for Insumos CRUD ---
+        // ── Insumos CRUD ─────────────────────────────────────────────────────────
 
         [RelayCommand]
         public void NuevoInsumo()
@@ -101,12 +105,11 @@ namespace KontrolSage.ViewModels
         public async Task EliminarInsumoAsync(Insumo insumo)
         {
             if (insumo == null || _repository == null) return;
-            // Todo: Show Confirmation Dialog
             await _repository.EliminarInsumoAsync(insumo.Id);
-            await ExecuteSearchAsync(SearchText); // Refresh
+            await ExecuteSearchAsync(SearchText);
         }
 
-        // --- Commands for Matrices CRUD ---
+        // ── Matrices CRUD ────────────────────────────────────────────────────────
 
         [RelayCommand]
         public void NuevaMatriz()
@@ -117,7 +120,7 @@ namespace KontrolSage.ViewModels
         [RelayCommand]
         public void EditarMatriz(MatrizAPU matriz)
         {
-             if (matriz != null)
+            if (matriz != null)
                 CurrentEditor = new MatrizEditorViewModel(_repository, CloseEditor, matriz);
         }
 
@@ -125,15 +128,122 @@ namespace KontrolSage.ViewModels
         public async Task EliminarMatrizAsync(MatrizAPU matriz)
         {
             if (matriz == null || _repository == null) return;
-            // Todo: Show Confirmation Dialog
             await _repository.EliminarMatrizAsync(matriz.Id);
-            await ExecuteSearchAsync(SearchText); // Refresh
+            await ExecuteSearchAsync(SearchText);
+        }
+
+        // ── Excel Import Commands ─────────────────────────────────────────────────
+
+        [RelayCommand]
+        public async Task ImportarInsumosExcelAsync()
+        {
+            await EjecutarImportacionAsync(TipoImportacion.Insumos);
+        }
+
+        [RelayCommand]
+        public async Task ImportarMatricesExcelAsync()
+        {
+            await EjecutarImportacionAsync(TipoImportacion.MatricesAPU);
+        }
+
+        private async Task EjecutarImportacionAsync(TipoImportacion tipo)
+        {
+            if (_repository == null || _excelImportService == null) return;
+
+            // 1. File picker
+            var window = GetMainWindow();
+            if (window == null) return;
+
+            var options = new FilePickerOpenOptions
+            {
+                Title = tipo == TipoImportacion.Insumos
+                    ? "Seleccionar Excel de Insumos"
+                    : "Seleccionar Excel de Matrices APU",
+                AllowMultiple = false,
+                FileTypeFilter = new[]
+                {
+                    new FilePickerFileType("Excel Workbook")
+                    {
+                        Patterns = new[] { "*.xlsx", "*.xls" },
+                        MimeTypes = new[]
+                        {
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            "application/vnd.ms-excel"
+                        }
+                    }
+                }
+            };
+
+            var files = await window.StorageProvider.OpenFilePickerAsync(options);
+            if (files == null || files.Count == 0) return;
+
+            var filePath = files[0].Path.LocalPath;
+
+            // 2. Parse Excel
+            IsBusy = true;
+            ExcelParseResult? parseResult = null;
+            try
+            {
+                parseResult = await _excelImportService.ParseExcelAsync(filePath);
+            }
+            catch (Exception ex)
+            {
+                // TODO: surface proper error dialog
+                _ = ex;
+                return;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+
+            if (parseResult == null || parseResult.TotalRows == 0 || parseResult.Headers.Count == 0)
+                return;
+
+            // 3. Show column mapping modal
+            bool confirmed = false;
+            ImportColumnMappingViewModel? mappingVm = null;
+
+            await Dispatcher.UIThread.InvokeAsync(async () =>
+            {
+                mappingVm = new ImportColumnMappingViewModel(parseResult, tipo);
+
+                var dialog = new ImportColumnMappingView(mappingVm);
+                // The code-behind wires SetCloseAction → Window.Close()
+                await dialog.ShowDialog(window);
+                confirmed = mappingVm.Confirmado;
+            });
+
+            if (!confirmed || mappingVm == null) return;
+
+            // 4. Persist to MongoDB
+            IsBusy = true;
+            try
+            {
+                if (tipo == TipoImportacion.Insumos && mappingVm.InsumosImportados != null)
+                    await _repository.ImportarLoteInsumosAsync(mappingVm.InsumosImportados);
+                else if (tipo == TipoImportacion.MatricesAPU && mappingVm.MatricesImportadas != null)
+                    await _repository.ImportarLoteMatricesAsync(mappingVm.MatricesImportadas);
+
+                await ExecuteSearchAsync(SearchText);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private static Window? GetMainWindow()
+        {
+            if (Avalonia.Application.Current?.ApplicationLifetime
+                is IClassicDesktopStyleApplicationLifetime desktop)
+                return desktop.MainWindow;
+            return null;
         }
 
         private void CloseEditor()
         {
             CurrentEditor = null;
-            // Reload grid data
             _ = ExecuteSearchAsync(SearchText);
         }
     }

@@ -17,7 +17,7 @@
                 <Grid Grid.Row="0" ColumnDefinitions="*,*,*,*,*,*" Margin="0,0,0,10">
                     <StackPanel Grid.Column="0" Spacing="5" Margin="0,0,10,0">
                         <TextBlock Text="Cantidad"/>
-                        <TextBox Text="{Binding Cantidad}" IsEnabled="{Binding IsEditable}"/>
+                        <TextBox Text="{Binding CantidadText, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEditable}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="5" Margin="0,0,10,0">
                         <TextBlock Text="Unidad"/>
@@ -93,8 +93,18 @@
                         <DataGridTextColumn Header="Tipo" Binding="{Binding TipoRecurso}" IsReadOnly="True" Width="1*"/>
                         
                         <!-- Editable Columns if not frozen -->
-                        <DataGridTextColumn Header="Rendimiento (hrs/jls)" Binding="{Binding Rendimiento, StringFormat='N4'}" Width="1.5*"/>
-                        <DataGridTextColumn Header="Cant. Form." Binding="{Binding CantidadTotalFormulada, StringFormat='N2'}" IsReadOnly="True" Width="1.2*"/>
+                        <DataGridTemplateColumn Header="Rendimiento" Width="1.5*">
+                            <DataTemplate>
+                                <TextBox Text="{Binding RendimientoText, UpdateSourceTrigger=PropertyChanged}" MinWidth="80" Margin="2"
+                                         IsEnabled="{Binding $parent[UserControl].((vm:DirectCostDetailViewModel)DataContext).IsEditable}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Cant. Form." Width="1.2*">
+                            <DataTemplate>
+                                <TextBox Text="{Binding CantidadFormuladaText, UpdateSourceTrigger=PropertyChanged}" MinWidth="80" Margin="2"
+                                         IsEnabled="{Binding $parent[UserControl].((vm:DirectCostDetailViewModel)DataContext).IsEditable}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn>
                         <DataGridTextColumn Header="PU" Binding="{Binding CostoUnitarioSnapshot, StringFormat='C2'}" IsReadOnly="True" Width="1.5*"/>
                         <DataGridTextColumn Header="Importe" Binding="{Binding ImporteTotal, StringFormat='C2'}" IsReadOnly="True" Width="1.5*"/>
                         

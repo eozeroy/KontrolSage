@@ -100,6 +100,28 @@ namespace KontrolSage.Services
              await _matrices.DeleteOneAsync(m => m.Id == id);
         }
 
+        public async Task ImportarLoteInsumosAsync(IEnumerable<Insumo> insumos)
+        {
+            var lista = new List<Insumo>(insumos);
+            foreach (var insumo in lista)
+                if (string.IsNullOrEmpty(insumo.Id))
+                    insumo.Id = ObjectId.GenerateNewId().ToString();
+
+            if (lista.Count > 0)
+                await _insumos.InsertManyAsync(lista);
+        }
+
+        public async Task ImportarLoteMatricesAsync(IEnumerable<MatrizAPU> matrices)
+        {
+            var lista = new List<MatrizAPU>(matrices);
+            foreach (var m in lista)
+                if (string.IsNullOrEmpty(m.Id))
+                    m.Id = ObjectId.GenerateNewId().ToString();
+
+            if (lista.Count > 0)
+                await _matrices.InsertManyAsync(lista);
+        }
+
         public async Task ImpactarAumentoPreciosCatalogoMaestro(string insumoId, decimal nuevoPrecio)
         {
             // 1. Update the base cost in the master item

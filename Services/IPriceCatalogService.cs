@@ -24,5 +24,9 @@ namespace KontrolSage.Services
         Task<MatrizAPU> ObtenerMatrizListaAsync(string id);
         Task GuardarGeneracionMatrizAsync(MatrizAPU matriz);
         Task ImpactarAumentoPreciosCatalogoMaestro(string insumoId, decimal nuevoPrecio);
+
+        // Importación masiva desde Excel
+        Task ImportarLoteInsumosAsync(IEnumerable<Insumo> insumos);
+        Task ImportarLoteMatricesAsync(IEnumerable<MatrizAPU> matrices);
     }
 }

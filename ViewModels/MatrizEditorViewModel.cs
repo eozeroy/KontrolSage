@@ -3,6 +3,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using KontrolSage.Models;
@@ -76,7 +77,12 @@ namespace KontrolSage.ViewModels
                 Descripcion = MatrizEditando.DescripcionConcepto;
                 Unidad = MatrizEditando.UnidadAnalisis;
                 CostoDirectoTotal = MatrizEditando.CostoDirectoTotal;
-                ComposicionSource.AddRange(MatrizEditando.Composicion);
+                
+                foreach (var comp in MatrizEditando.Composicion)
+                {
+                    comp.PropertyChanged += Comp_PropertyChanged;
+                    ComposicionSource.Add(comp);
+                }
             }
         }
 
@@ -149,6 +155,7 @@ namespace KontrolSage.ViewModels
                 Rendimiento = 1m
             };
 
+            comp.PropertyChanged += Comp_PropertyChanged;
             ComposicionSource.Add(comp);
             RecalcularTotal();
             
@@ -161,7 +168,17 @@ namespace KontrolSage.ViewModels
         {
             if (comp != null)
             {
+                comp.PropertyChanged -= Comp_PropertyChanged;
                 ComposicionSource.Remove(comp);
+                RecalcularTotal();
+            }
+        }
+
+        private void Comp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ComposicionMatriz.Cantidad) || 
+                e.PropertyName == nameof(ComposicionMatriz.Rendimiento))
+            {
                 RecalcularTotal();
             }
         }

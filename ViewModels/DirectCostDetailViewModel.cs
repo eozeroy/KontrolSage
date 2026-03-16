@@ -47,10 +47,24 @@ namespace KontrolSage.ViewModels
             }
         }
 
-        public decimal Cantidad
+        // ── Safe string-backed binding for Cantidad ─────────────────────────────
+        // Binding TextBox.Text to decimal directly fails silently on intermediate inputs.
+        private string _cantidadText = "0";
+        public string CantidadText
         {
-            get => ActividadEditando.Cantidad;
-            set { ActividadEditando.Cantidad = value; OnPropertyChanged(); RecalcularImportes(); }
+            get => _cantidadText;
+            set
+            {
+                _cantidadText = value;
+                OnPropertyChanged();
+                if (decimal.TryParse(value, System.Globalization.NumberStyles.Any,
+                                     System.Globalization.CultureInfo.InvariantCulture, out var parsed)
+                    || decimal.TryParse(value, out parsed))
+                {
+                    ActividadEditando.Cantidad = parsed;
+                    RecalcularImportes();
+                }
+            }
         }
 
         public string Unidad
@@ -100,6 +114,7 @@ namespace KontrolSage.ViewModels
             _directCostService = directCostService;
             _catalogService = catalogService;
             _closeAction = closeAction;
+            _cantidadText = actividad.Cantidad.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             if (actividad.RecursosAsignados != null)
             {
@@ -115,7 +130,8 @@ namespace KontrolSage.ViewModels
 
         private void OnRecursoPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(RecursoAsignado.Rendimiento))
+            if (e.PropertyName == nameof(RecursoAsignado.Rendimiento) ||
+                e.PropertyName == nameof(RecursoAsignado.CantidadTotalFormulada))
             {
                 RecalcularImportes();
             }
@@ -214,17 +230,18 @@ namespace KontrolSage.ViewModels
         {
             decimal total = 0;
             foreach (var rec in RecursosAsignadosSource)
-            {
-                RecursoUpdateAmount(rec);
                 total += rec.ImporteTotal;
-            }
             CostoDirectoTotal = total;
         }
 
         private void RecursoUpdateAmount(RecursoAsignado rec)
         {
-            // Cantidad Formulado = Cantidad of Activity * Rendimiento of Resource
-            rec.CantidadTotalFormulada = ActividadEditando.Cantidad * rec.Rendimiento;
+            // Si la actividad ya tiene una cantidad, calculamos automáticamente.
+            // Si no, dejamos en Rendimiento (el valor por unidad) para que sea útil desde el inicio.
+            var cantAct = ActividadEditando.Cantidad;
+            rec.CantidadTotalFormulada = cantAct != 0
+                ? cantAct * rec.Rendimiento
+                : rec.Rendimiento; // Default: mostrar Rendimiento directamente
         }
 
         [RelayCommand]

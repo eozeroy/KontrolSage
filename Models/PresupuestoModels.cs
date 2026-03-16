@@ -53,10 +53,32 @@ namespace KontrolSage.Models
             { 
                  if (_rendimiento != value) {
                      _rendimiento = value;
+                     _rendimientoText = value.ToString(System.Globalization.CultureInfo.InvariantCulture);
                      OnPropertyChanged();
+                     OnPropertyChanged(nameof(RendimientoText));
                      OnPropertyChanged(nameof(ImporteTotal));
                  }
             } 
+        }
+
+        // ── Safe string-backed binding for Rendimiento ──────────────────────────
+        // Prevents silent failures when TextBox.Text is bound to decimal with UpdateSourceTrigger=PropertyChanged
+        private string _rendimientoText = "1";
+        [BsonIgnore]
+        public string RendimientoText
+        {
+            get => _rendimientoText;
+            set
+            {
+                _rendimientoText = value;
+                OnPropertyChanged();
+                if (decimal.TryParse(value, System.Globalization.NumberStyles.Any,
+                                     System.Globalization.CultureInfo.InvariantCulture, out var parsed)
+                    || decimal.TryParse(value, out parsed))
+                {
+                    Rendimiento = parsed;
+                }
+            }
         }
         
         private decimal _cantidadTotalFormulada = 0m;
@@ -68,10 +90,31 @@ namespace KontrolSage.Models
             { 
                  if (_cantidadTotalFormulada != value) {
                      _cantidadTotalFormulada = value;
+                     _cantidadFormuladaText = value.ToString(System.Globalization.CultureInfo.InvariantCulture);
                      OnPropertyChanged();
+                     OnPropertyChanged(nameof(CantidadFormuladaText));
                      OnPropertyChanged(nameof(ImporteTotal));
                  }
             } 
+        }
+
+        // ── Safe string-backed binding for CantidadTotalFormulada ───────────────
+        private string _cantidadFormuladaText = "0";
+        [BsonIgnore]
+        public string CantidadFormuladaText
+        {
+            get => _cantidadFormuladaText;
+            set
+            {
+                _cantidadFormuladaText = value;
+                OnPropertyChanged();
+                if (decimal.TryParse(value, System.Globalization.NumberStyles.Any,
+                                     System.Globalization.CultureInfo.InvariantCulture, out var parsed)
+                    || decimal.TryParse(value, out parsed))
+                {
+                    CantidadTotalFormulada = parsed;
+                }
+            }
         }
 
         [BsonRepresentation(BsonType.Decimal128)]

@@ -1,6 +1,8 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace KontrolSage.Models
 {
@@ -72,9 +74,14 @@ namespace KontrolSage.Models
 
     /// <summary>
     /// Documento embebido para evitar el N+1 Query Problem en MongoDB
+    /// Implementa INotifyPropertyChanged para actualizar la UI en vivo (DataGrid).
     /// </summary>
-    public class ComposicionMatriz
+    public class ComposicionMatriz : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
         [BsonElement("insumoId")]
         [BsonRepresentation(BsonType.ObjectId)]
         public string InsumoId { get; set; } = string.Empty;
@@ -87,13 +94,39 @@ namespace KontrolSage.Models
         [BsonRepresentation(BsonType.String)]
         public TipoInsumo Tipo { get; set; }
 
+        private decimal _cantidad;
         [BsonElement("cantidad")]
         [BsonRepresentation(BsonType.Decimal128)]
-        public decimal Cantidad { get; set; }
+        public decimal Cantidad
+        {
+            get => _cantidad;
+            set
+            {
+                if (_cantidad != value)
+                {
+                    _cantidad = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ImporteDirecto));
+                }
+            }
+        }
 
+        private decimal _rendimiento = 1m;
         [BsonElement("rendimiento")]
         [BsonRepresentation(BsonType.Decimal128)]
-        public decimal Rendimiento { get; set; } = 1m; // Por defecto es 1 (usado más en mano de obra)
+        public decimal Rendimiento
+        {
+            get => _rendimiento;
+            set
+            {
+                if (_rendimiento != value)
+                {
+                    _rendimiento = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ImporteDirecto));
+                }
+            }
+        }
 
         [BsonElement("costoUnitarioSnapshot")]
         [BsonRepresentation(BsonType.Decimal128)]

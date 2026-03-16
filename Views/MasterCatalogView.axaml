@@ -33,7 +33,14 @@
                              <!-- TAB: MATRICES APU -->
                              <TabItem Header="Matrices y Analisis (APU)" FontSize="16">
                                  <Grid RowDefinitions="Auto,*" Margin="0,10,0,0">
-                                     <Button Grid.Row="0" Content="+ Nueva Matriz" Command="{Binding NuevaMatrizCommand}" HorizontalAlignment="Right" Margin="0,0,0,10"/>
+                                     <!-- Toolbar -->
+                                     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8"
+                                                 HorizontalAlignment="Right" Margin="0,0,0,10">
+                                         <Button Content="📥 Importar Excel"
+                                                 Command="{Binding ImportarMatricesExcelCommand}"/>
+                                         <Button Content="+ Nueva Matriz"
+                                                 Command="{Binding NuevaMatrizCommand}"/>
+                                     </StackPanel>
                                      
                                      <Border Grid.Row="1" CornerRadius="5" Padding="0" BorderBrush="#E0E0E0" BorderThickness="1">
                                          <Grid RowDefinitions="Auto,*">
@@ -84,7 +91,14 @@
                              <!-- TAB: INSUMOS BASICOS -->
                              <TabItem Header="Insumos Básicos" FontSize="16">
                                  <Grid RowDefinitions="Auto,*" Margin="0,10,0,0">
-                                     <Button Grid.Row="0" Content="+ Nuevo Insumo" Command="{Binding NuevoInsumoCommand}" HorizontalAlignment="Right" Margin="0,0,0,10"/>
+                                     <!-- Toolbar -->
+                                     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8"
+                                                 HorizontalAlignment="Right" Margin="0,0,0,10">
+                                         <Button Content="📥 Importar Excel"
+                                                 Command="{Binding ImportarInsumosExcelCommand}"/>
+                                         <Button Content="+ Nuevo Insumo"
+                                                 Command="{Binding NuevoInsumoCommand}"/>
+                                     </StackPanel>
                                      
                                      <Border Grid.Row="1" CornerRadius="5" Padding="0" BorderBrush="#E0E0E0" BorderThickness="1">
                                          <Grid RowDefinitions="Auto,*">
